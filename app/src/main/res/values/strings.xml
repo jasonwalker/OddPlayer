@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Odd Player</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_download">DownloadActivity</string>
+    <string name="title_activity_feeds">FeedsActivity</string>
+    <string name="title_activity_episode">EpisodeActivity</string>
+    <string name="crash_toast_text">Crash!</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="goToEpisode">Jump To Episode</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="feedImage">Feed Image</string>
+    <string name="pushEpisodesToTop">Automatically Push Episodes to Top</string>
+    <string name="secondsOfEpisode">seconds of episode</string>
+    <string name="skipLast">Skip final</string>
+    <string name="downloadOlderEpisodes">View Older</string>
+    <string name="skipFirst">Skip first</string>
+    <string name="getStarted">To get started, please enter a feed URL and then press refresh button at top.</string>
+    <string name="titlePlay">Play</string>
+    <string name="titleFeeds">Feeds</string>
+    <string name="titleEpisodes">Episodes</string>
+    <string name="titleSettings">Settings</string>
+    <string name="confirmDeleteEpisodes">Are you sure that you want to delete the %1$d episode(s)?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="finishedDownloadind">Finished downloading %1$d podcasts of %2$d queued</string>
+    <string name="downloadInterrupted">%1$s: Downloaded %2$d podcasts of %3$d queued</string>
+    <string name="noFeedConnect">Could not connect to feed</string>
+    <string name="currentlyDownloadingOld">Downloading %1$d episodes. Go to \"Episodes\" to view progress</string>
+    <string name="enableWifiForFeedsList">Please enable WIFI to pull down this feed\'s episode list.</string>
+    <string name="enableWifiOrMobileForFeedsList">Please enable WIFI or mobile data to pull down this feed\'s episode list.</string>
+    <string name="enableWifiForEpisodeList">Please enable WIFI to pull down this feed\'s episode list.</string>
+    <string name="enableWifiOrMobileForEpisodeList">Please enable WIFI or mobile data to pull down this feed\'s episode list.</string>
+    <string name="skipFirstBadNumber">Skip first: %1$s is not a valid number.  Please change.</string>
+    <string name="skipLastBadNumber">Skip last: %1$s is not a valid number.  Please change.</string>
+    <string name="confirmEnableMobileData">Are you sure you want to allow the use of mobile data.  Some downloads may incur large charges.</string>
+    <string name="lastPubDate">"Last Pub date: %1$s"</string>
+    <string name="numberEpisodes">Number Episodes: %1$d</string>
+    <string name="scanQRCode">Scan QR code</string>
+    <string name="testURL">Test URL</string>
+    <string name="addUrl">Add URL</string>
+    <string name="goNext">Move next</string>
+    <string name="delete">Delete</string>
+    <string name="enterFeed">Enter Feed</string>
+    <string name="deleteSelectedFeed">Delete Selected Feed</string>
+    <string name="maxNumberDownloads">Max downloads per feed (0 unlimited)</string>
+    <string name="useOnlyWIFI">Use only WIFI (no 3G, 4G etc)</string>
+    <string name="downloadOldEpisodes">Download Old Episodes</string>
+    <string name="downloadSelected">Download Selected</string>
+    <string name="parsingFeed">Parsing feed: %1$s</string>
+    <string name="couldNotConnectToFeed">Error: could not connect to feed: %1$s</string>
+    <string name="feedMalformedXML">Error: feed %s has malformed XML</string>
+    <string name="failedToDownloadEpisode">Failed to download: %1$s: %2$s</string>
+    <string name="attemptingEpisodeDownload">Attempting download of : %1$s:%2$s (%3$d/%4$d)</string>
+    <string name="pubDate">Pub date: %s</string>
+    <string name="episodeNumber">Episode Number: %1$d</string>
+    <string name="confirmDeleteEpisodesBeforeCurrent">Are you sure that you want to delete the %1$d episode(s) before the current one?</string>
+    <string name="enableWIFIToDownloadEpisodes">Please enable WIFI to download episodes.</string>
+    <string name="enableWIFIOrMobileToDownloadEpisodes">Please enable WIFI or mobile data to download episodes.</string>
+    <string name="cannotGainAudioFocus">Cannot gain audio focus</string>
+    <string name="mediaPlayerFailed">Media player failed with: %1$d : %2$d</string>
+    <string name="noEpisodesAvailable">No episodes currently available</string>
+    <string name="atLastEpisode">At last episode</string>
+    <string name="ok">OK</string>
+    <string name="sureToDeleteFeeds">Are you sure that you want to delete the %1$d feed(s)?</string>
+    <string name="feedSuccessfullyEntered">Feed: %1$s successfully entered</string>
+    <string name="duplicateFeed">Duplicate feed: %1$s</string>
+    <string name="feedHasMalformedXML">Error: feed at URL: \"%1$s\"</string>
+    <string name="feedAlreadyExists">The feed: %1$s already exists</string>
+    <string name="imageFileNotDeleted">Image file could not be deleted</string>
+    <string name="couldNotCreateImageFile">Could not create new file on device for image</string>
+    <string name="couldNotCreateDirectory">Could not create a directory on this device</string>
+    <string name="buildDate">Build date:</string>
+    <string name="noEpisodesToDelete">There are no episodes to delete (on first episode)</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="parsedEpisode">Parsed Episode: %1$s</string>
+    <string name="confirmChangeStorage">Changing the storage location will take some time as all of the downloaded files will need to be copied to the new location.  Are you sure you want to proceed?</string>
+    <string name="notValidNumber">The value: %1$s is not a valid number.  Please change.</string>
+    <string name="movingFile">Moving file %1$s of %2$s</string>
+    <string name="preparingToMoveFile">Preparing to move %1$d files</string>
+    <string name="completedMovingFile">Completed moving %1$d files</string>
+    <string name="fileMoveFailed">File move failed: %1$s</string>
+    <string name="episodeNumberOfTotal">Episode %1$s of %2$s (%3$sM/%4$sM</string>
+    <string name="feedAndEpisodeName">%1$s\n%2$s</string>
+    <string name="enableWifiForNewFeed">Please enable WIFI to import feeds (for verification).</string>
+    <string name="podcastUrl">Add Podcast URL</string>
+    <string name="urlLabel">URL:</string>
+    <string name="playEpisodeMenuTitle">Play Episode</string>
+    <string name="refreshEpisodeMenuTitle">Refresh Episodes</string>
+    <string name="deleteEpisodeMenuTitle">Delete Previous Episodes</string>
+    <string name="feedImageLabel">feed image</string>
+    <string name="playImageLabel">play image</string>
+    <string name="blockerImageLabel">blocker image</string>
+    <string name="rewindButtonLabel"><![CDATA[<<]]></string>
+    <string name="fastForwardButtonLabel"><![CDATA[>>]]></string>
+    <string name="changeStorageSettingsLabel">Change storage:</string>
+    <string name="numberMillisecondsToSkip">Number of milliseconds to FF/Rewind</string>
+    <string name="attemptingToEnterFeed">Attempting to enter feed: %1$s</string>
+    <string name="disableFeed">Disable Feed</string>
+    <string name="deleted">Deleted %1$s</string>
+    <string name="qrScanReturnedNull">QR code scan returned null</string>
+    <string name="qrCodeScanCancelled">QR code scan canceled</string>
+    <string name="qrCodeScanException">QR code scan exception: %1$s</string>
+    <string name="pausePlayImageResource">pause/play image</string>
+    <string name="toggleDescriptionButtonResource">toggle description button</string>
+    <string name="filterLabel">Filter</string>
+    <string name="FileBackupIndex"><![CDATA[
+    <html>
+        <head>Odd Player Backup Page</head>
+        <h3>Odd Player Backup Page</h3>
+        <ol>
+            <li><a href=\"%2$s/meta\">Download meta data (copy mp3s from SD card over separately) &#8212; More work but takes only a few minutes</a></li>
+            <ol>
+                <li>**You must have an SD card inserted into phone and OddPlayer is configured to use it (on Settings page)**</li>
+                <li>Save metadata to your computer</li>
+                <li>If your data is not on your SD card, in OddPlayer, go to settings and under "Change Storage", use the
+                 drop-down to select "external storage" </li>
+                <li>After downloading meta data, plug your phone into your computer.  Browse to your SD Card
+                and go to %1$s</li>
+                <li>copy the entire directory of "episodes" to your computer</li>
+                <li>Install OddPlayer on new phone</li>
+                <li>Start "Export Server" on new phone</li>
+                <li>In browser, upload metadata to new phone from this page</li>
+                <li>copy downloaded directory to %1$s
+                to your new phone</li>
+            </ol>
+            <br /><br />
+            <li><a href=\"%2$s/all\">Download ALL backup data (includes all mp3s-possibly very large) &#8212; Less work but takes several hours</a></li>
+            <ol>
+                <li>Save very large file of metadata and mp3s to computer</li>
+                <li>Install OddPlayer on new phone</li>
+                <li>In browser, upload downloaded file to new phone</li>
+        </ol>
+        <h3>Upload backup file</h3>
+        <form method=\"post\" action=\"upload\" name=\"submit\" enctype=\"multipart/form-data\">
+          <input type=\"file\" name=\"filename\"><br /><br />
+          <input type=\"submit\" name=\"submit\" value=\"Submit\">
+        </form>
+    </html>
+    ]]></string>
+    <string name="goToUrlForBackup">In a web browser go to:\nhttp://%1$s:%2$d\nto download backup</string>
+    <string name="emergencyShutdown">Emergency shutdown!</string>
+    <string name="backupFailed">Backup failed: %1$s</string>
+    <string name="successfulUploadOfLength">Successful upload of length: %1$d</string>
+    <string name="couldNotStartServer">"Could not start server: %1$s "</string>
+    <string name="writingBackupDataFailed">Writing backup data failed: %1$s</string>
+    <string name="duration">Duration: %1$s</string>
+    <string name="listPubDate">Pub. date: %1$s</string>
+    <string name="listDuration">Duration: %1$s</string>
+    <string name="enableWifiForBackup">Please enable wifi to use backup server</string>
+    <string name="enableWifiOrMobileDataForBackup">Please enable wifi or mobile data to use backup server</string>
+    <string name="deleteEpisodeAfterListening">Are you sure you want delete episodes immediately after listening to them?</string>
+    <string name="enterUrlManually">Enter URL Manually</string>
+    <string name="addEnteredUrl">Add Entered URL</string>
+    <string name="searchString">Search string</string>
+    <string name="enterSearchTerms">Enter Search Term</string>
+    <string name="url">URL:</string>
+    <string name="manuallEnterUrl">Manually Enter URL</string>
+    <string name="pasteFromClipboard">Paste URL From Clipboard</string>
+    <string name="feedSearch">Feed Search</string>
+    <string name="submit">Submit</string>
+    <string name="addSelected">Add Selected</string>
+    <string name="title">Title</string>
+    <string name="deleteFileAfterListening">Delete file after listening</string>
+    <string name="exportServer">Export Server</string>
+    <string name="stopExportServr">Stop Export</string>
+    <string name="search">Search</string>
+    <string name="apply">Apply</string>
+    <string name="cancel">Cancel</string>
+    <string name="dailyDownloadTime">Daily Download Time</string>
+    <string name="feedIconDescription">Feed icon</string>
+    <string name="couldNotMoveFiles">"Could not move files: %1$s: "</string>
+    <string name="sureAboutAddingPodcasts">Are you sure that you would like to add the new podcasts: %s?</string>
+    <string name="noNewPodcastsToAdd">There were no new podcasts to add.</string>
+    <string name="dataOrWifiMustBeEnabled">Data/Wifi must be enabled to download</string>
+    <string name="noDownloadBecauseNoData">Could not start download because 4G/wifi turned off</string>
+    <string name="problemInitializing">Could not initialize player.  Did phone run out of memory?</string>
+    <string name="quickStart">Quick Start!</string>
+    <string name="enableWifiToAddFeeds">Please enable WIFI to add feeds</string>
+    <string name="enableWifiOrMobileToAddFeeds">Please enable WIFI or mobile data to add feeds</string>
+    <string name="emergencyStopByUser">Emergency stop by user.</string>
+    <string name="switchedOffWifiStoppingDownload">No longer using WIFI, configured to only use WIFI so stopping download</string>
+    <string name="attemptingToStopDownload">Attemtping to stop download...</string>
+
+    <string-array name="filter_choice">
+        <item>Filter by feed name</item>
+        <item>Filter by episode name</item>
+    </string-array>
+
+
+
+</resources>

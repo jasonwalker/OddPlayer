@@ -1,0 +1,70 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/descriptionFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/border_line"
+    android:padding="5dp"
+    android:textAlignment="center"
+    tools:context=".play.PlayFragment">
+
+    <ImageView
+        android:id="@+id/feedImage"
+        android:contentDescription="@string/feedIconDescription"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
+
+    <TextView
+        android:id="@+id/feedName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/feedDate"
+        android:layout_toEndOf="@+id/feedImage"
+        android:gravity="center_vertical|center_horizontal"
+        android:text=""
+        android:textAlignment="center"
+        android:textColor="#ff873d00"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_alignTop="@+id/feedImage" />
+
+    <TextView
+        android:id="@+id/feedDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/playTitle"
+        android:layout_toEndOf="@+id/feedImage"
+        android:gravity="center_vertical|center_horizontal"
+        android:text=""
+        android:textAlignment="center"
+        android:textColor="#FFcd1010"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/playTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/feedImage"
+        android:textColor="#ffE8893A"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/playDisplay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/playTitle"
+        android:clickable="true"
+        android:textColor="#ffffffff"
+        android:textColorHighlight="#ff111111"
+        android:textStyle="normal" />
+
+</RelativeLayout>

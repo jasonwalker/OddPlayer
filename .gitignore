@@ -1,0 +1,9 @@
+.gradle/
+.idea/
+app.iml
+*.iml
+build/
+gradle/
+local.properties
+*.mp3
+*.pyc

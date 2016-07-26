@@ -1,0 +1,222 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:background="#ff000000"
+    android:focusableInTouchMode="false">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/border_line"
+        android:gravity="center_horizontal"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:padding="10dp"
+        android:textAlignment="center"
+        tools:context="com.jmw.rd.oddplay.settings.SettingsViewPage">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/buildDateLayout"
+            android:layout_marginBottom="30dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:text="@string/buildDate"
+                android:textSize="16sp"
+                android:layout_marginEnd="6dp"/>
+            <TextView
+                android:id="@+id/buildDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"/>
+        </LinearLayout>
+        <TextView
+            android:id="@+id/settingsInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:layout_below="@+id/buildDateLayout"
+            android:background="@color/header_background"
+            android:focusableInTouchMode="false"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:textColor="@color/header_text"
+            android:layout_alignEnd="@+id/numberDownloadsSection" />
+
+        <LinearLayout
+            android:id="@+id/numberDownloadsSection"
+            android:layout_below="@+id/settingsInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/maxDownloadsPerFeed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:ems="4"
+                android:inputType="number"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:background="@drawable/edit_background"/>
+
+            <TextView
+                android:id="@+id/maxDownloadsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text="@string/maxNumberDownloads"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:labelFor="@id/maxDownloadsPerFeed"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/numberMsToSkip"
+            android:layout_below="@+id/numberDownloadsSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/numberMsToSkipInput"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:ems="4"
+                android:inputType="number"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:background="@drawable/edit_background"
+                android:gravity="center_vertical" />
+
+            <TextView
+                android:id="@+id/numberMsToSkipLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text="@string/numberMillisecondsToSkip"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:labelFor="@id/numberMsToSkipInput"
+                android:gravity="center_vertical" />
+
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/useOnlyWifiCheckbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/numberMsToSkip"
+            android:text="@string/useOnlyWIFI"
+            android:textColor="@color/white"
+            android:layout_marginEnd="6dp"
+            android:textSize="16sp" />
+
+        <CheckBox
+            android:id="@+id/deleteAfterListening"
+            android:layout_below="@id/useOnlyWifiCheckbox"
+            android:visibility="visible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/deleteFileAfterListening"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true" />
+
+        <LinearLayout
+            android:id="@+id/downloadTimeLayout"
+            android:layout_below="@id/deleteAfterListening"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:layout_alignParentStart="true">
+            <CheckBox
+                android:id="@+id/downloadTimeSet"
+                android:visibility="visible"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dailyDownloadTime"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical" />
+
+            <Space
+                android:layout_width="10sp"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:layout_width="140dp"
+                android:layout_height="match_parent"
+                android:id="@+id/downloadTimeTextView"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:text=""
+                android:layout_margin="0dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/chooseStorageSection"
+            android:layout_below="@+id/downloadTimeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/changeStorage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/changeStorageSettingsLabel"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:layout_marginEnd="6dp"
+                android:gravity="center_vertical|start"
+                android:textAlignment="center" />
+
+            <Spinner
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/externalStorageSelector"
+                android:layout_marginStart="30dp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@+id/chooseStorageSection">
+            <com.jmw.rd.oddplay.widgets.SmallButton
+                android:id="@+id/exportDataStartButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/exportServer" />
+            <com.jmw.rd.oddplay.widgets.SmallButton
+                android:id="@+id/exportDataStopButton"
+                android:layout_marginLeft="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/stopExportServr" />
+        </LinearLayout>
+
+
+    </RelativeLayout>
+</LinearLayout>
+

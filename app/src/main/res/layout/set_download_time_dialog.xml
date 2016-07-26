@@ -1,0 +1,32 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/border_line"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+    <TimePicker
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/alarmTimePicker"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <com.jmw.rd.oddplay.widgets.SmallButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/apply"
+            android:id="@+id/applyAlarmTimeButton"
+            android:layout_gravity="center_horizontal" />
+        <com.jmw.rd.oddplay.widgets.SmallButton
+            android:id="@+id/cancelSetApplyAlarmTimeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/cancel"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignBottom="@+id/applyAlarmTimeButton" />
+    </RelativeLayout>
+
+</LinearLayout>

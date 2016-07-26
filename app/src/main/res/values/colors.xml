@@ -1,0 +1,73 @@
+<resources>
+
+    <color name="black_overlay">#66000000</color>
+    <color name="red">#FF770000</color>
+    <color name="gold">#FFFFD700</color>
+    <color name="black">#FF000000</color>
+    <color name="orange">#FFFFA500</color>
+    <color name="brown">#FF8B4513</color>
+    <color name="white">#ffffffff</color>
+
+    <color name="timing_text_selected">#FFAA0000</color>
+    <color name="timing_text_unselected">#FFeeeeee</color>
+
+
+    <color name="button_disable">#aa222222</color>
+    <color name="button_highlight">#88FFFF66</color>
+    <color name="button_no_highlight">#00000000</color>
+
+    <color name="progress_start">#FF238b8b</color>
+    <color name="progress_middle">#FF006666</color>
+    <color name="progress_end">#FF005151</color>
+
+    <color name="thumb_start">#ff238b8b</color>
+    <color name="thumb_end">#ff005151</color>
+    <color name="thumb_border">#ff000000</color>
+
+    <color name="pause_top">#FFAA0000</color>
+    <color name="pause_bottom">#FF5c0000</color>
+
+    <color name="play_top">#FF008800</color>
+    <color name="play_bottom">#FF004900</color>
+
+    <color name="divider">#ff5c0000</color>
+
+    <color name="header_background">#ff000000</color>
+    <color name="header_text">#ff238b8b</color>
+
+    <color name="name">#ff873d00</color>
+    <color name="episode_text">#ffaa4d00</color>
+    <color name="episode_date">#FFe8893a</color>
+    <color name="episode_number">#FFAA0000</color>
+
+    <color name="number_episodes_text">#ffaa4d00</color>
+
+    <color name="feed_header_background">#ff444444</color>
+
+    <color name="border">#FF888888</color>
+
+    <color name="default_screen_bg">#f9f9f9</color>
+    <color name="rounded_container_bg">#222222</color>
+    <color name="rounded_container_border">#3b3f44</color>
+    <color name="light_gray_header_color">#646663</color>
+
+    <color name="normal_button_top">#ff005151</color>
+    <color name="normal_button_bottom">#ff003737</color>
+
+    <color name="pressed_button_top">#ff238b8b</color>
+    <color name="pressed_button_bottom">#ff0a7b7b</color>
+
+    <color name="hilite_button_top">#FFFFD700</color>
+    <color name="hilite_button_bottom">#FFFFA500</color>
+
+    <color name="hilite_pressed_button_top">#FFFFA500</color>
+    <color name="hilite_pressed_button_bottom">#FF8B4513</color>
+
+    <color name="currentEpisodeInList">#ff330000</color>
+    <color name="defaultEpisodeInList">#ff000000</color>
+    <color name="downloadedEpisodeInList">#ff333333</color>
+
+    <color name="popup_text">#ff238b8b</color>
+    <color name="drawer_selector">#ff873d00</color>
+
+</resources>

@@ -1,0 +1,104 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/border_line"
+    android:padding="5dp">
+    <RelativeLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/episodeDetailImage"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="10dp"
+            android:contentDescription="@string/feedImage" />
+
+        <TextView
+            android:id="@+id/episodeDetailFeedName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@id/episodeDetailImage"
+            android:text=""
+            android:textColor="@color/name"
+            android:textSize="14sp"
+            android:textStyle="italic" />
+
+        <TextView
+            android:id="@+id/episodeDetailTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/episodeDetailFeedName"
+            android:layout_toEndOf="@id/episodeDetailImage"
+            android:text=""
+            android:textColor="@color/episode_text"
+            android:textSize="14sp"
+            android:textStyle="normal" />
+    </RelativeLayout>
+    <TextView
+        android:id="@+id/episodeDetailPublishDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/headerLayout"
+        android:text=""
+        android:textColor="@color/episode_date"
+        android:textSize="15sp"
+        android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/episodeDetailDuration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/episodeDetailPublishDate"
+        android:text=""
+        android:textColor="@color/episode_date"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/episodeDetailEpisodeNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/episodeDetailDuration"
+        android:text=""
+        android:textColor="@color/episode_number" />
+
+    <TextView
+        android:id="@+id/episodeDetailDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/episodeDetailGotoButton"
+        android:layout_below="@+id/episodeDetailEpisodeNumber"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:clickable="true" />
+
+    <com.jmw.rd.oddplay.widgets.SmallButton
+        android:id="@+id/episodeDetailGotoButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:text="@string/goToEpisode" />
+
+    <com.jmw.rd.oddplay.widgets.SmallButton
+        android:id="@+id/episodeDetailCancelButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@id/episodeDetailGotoButton"
+        android:text="@string/dismiss" />
+
+</RelativeLayout>
+

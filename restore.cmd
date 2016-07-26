@@ -1,0 +1,6 @@
+adb shell su -c 'rm -r /data/data/com.jmw.rd.podplay'
+adb shell su -c 'mkdir /data/data/com.jmw.rd.podplay/'
+adb shell su -c 'cp -r /mnt/sdcard/backup/dbs/* /data/data/com.jmw.rd.podplay/'
+adb shell su -c 'mkdir /mnt/sdcard/Android/data/com.jmw.rd.podplay/'
+adb shell su -c 'cp -r /mnt/sdcard/backup/files/* /mnt/sdcard/Android/data/com.jmw.rd.podplay/files/'
+adb shell su -c 'chmod -R 777 /data/data/com.jmw.rd.podplay'

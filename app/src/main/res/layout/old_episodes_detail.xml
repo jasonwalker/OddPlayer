@@ -1,0 +1,108 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/border_line"
+    android:paddingBottom="5dp">
+
+    <TextView
+        android:id="@+id/downloadOldEpisodesLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/downloadOldEpisodes"
+        android:textColor="@color/white" />
+
+    <RelativeLayout
+        android:id="@+id/oldInfoSection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/downloadOldEpisodesLabel"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_toStartOf="@+id/oldOpenFilterButton">
+            <TextView
+                android:id="@+id/oldEpisodeNameText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/header_background"
+                android:focusableInTouchMode="false"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:textColor="@color/header_text" />
+            <TextView
+                android:id="@+id/oldEpisodeInfoText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/header_background"
+                android:focusableInTouchMode="false"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:textColor="@color/header_text"/>
+        </LinearLayout>
+        <com.jmw.rd.oddplay.widgets.SmallButton
+            android:id="@id/oldOpenFilterButton"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="@string/filterLabel"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="5dp"
+            android:indeterminate="false" />
+    </RelativeLayout>
+    <LinearLayout
+        android:id="@+id/oldEpisodeFilter"
+        android:layout_width="match_parent"
+        android:layout_below="@id/oldInfoSection"
+        android:layout_height="0dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginStart="5dp"
+        android:orientation="vertical">
+        <EditText
+            android:id="@+id/oldEpisodeFilterText"
+            android:layout_height="30dp"
+            android:layout_width="match_parent"
+            android:background="@drawable/edit_background"
+            android:inputType="text"/>
+    </LinearLayout>
+
+
+    <ListView
+        android:id="@+id/oldEpisodesList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/downloadOldEpisodesButton"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/oldEpisodeFilter"
+        android:layout_marginBottom="6dp"
+        android:background="@drawable/border_line"
+        android:divider="@color/divider"
+        android:dividerHeight="1dp"
+        android:drawSelectorOnTop="false"
+        android:padding="1dp" />
+
+    <com.jmw.rd.oddplay.widgets.SmallButton
+        android:id="@+id/downloadOldEpisodesButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="5dp"
+        android:text="@string/downloadSelected" />
+
+    <com.jmw.rd.oddplay.widgets.SmallButton
+        android:id="@+id/oldEpisodesCancelButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="5dp"
+        android:text="@string/dismiss" />
+
+</RelativeLayout>

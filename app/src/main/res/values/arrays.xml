@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="drawer_rows">
+        <item>"Play"</item>
+        <item>"Episodes"</item>
+        <item>"Feeds"</item>
+        <item>"Settings"</item>
+    </string-array>
+
+</resources>

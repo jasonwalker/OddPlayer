@@ -1,0 +1,29 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:oddplayer="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+    <item
+        android:id="@+id/action_toggle_play_episode"
+        android:icon="@drawable/ic_menu_play_clip"
+        android:orderInCategory="100"
+        android:title="@string/playEpisodeMenuTitle"
+        oddplayer:showAsAction="always"
+        tools:ignore="AlwaysShowAction" />
+
+    <item
+        android:id="@+id/action_refresh_episodes"
+        android:actionLayout="@layout/refresh_animate"
+        android:icon="@drawable/ic_menu_refresh"
+        android:orderInCategory="100"
+        android:title="@string/refreshEpisodeMenuTitle"
+        oddplayer:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_delete_episodes"
+        android:icon="@drawable/ic_menu_delete"
+        android:orderInCategory="100"
+        android:title="@string/deleteEpisodeMenuTitle"
+        oddplayer:showAsAction="always" />
+
+</menu>

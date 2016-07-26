@@ -1,0 +1,1 @@
+adb shell su -c 'rm -r /mnt/sdcard/backup/'

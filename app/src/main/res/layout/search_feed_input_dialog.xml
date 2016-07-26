@@ -1,0 +1,66 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/border_line"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+    <TextView
+        android:id="@+id/feedSearchLabel"
+        android:layout_width="387dp"
+        android:layout_height="41dp"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal"
+        android:text="@string/enterSearchTerms"
+        android:textAlignment="center"
+        android:textColor="@color/name"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp">
+
+        <EditText
+            android:id="@+id/enteredFeedSearchTerm"
+            android:inputType="textUri"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/border_line"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:textColor="@color/popup_text" />
+    </LinearLayout>
+
+
+    <com.jmw.rd.oddplay.widgets.SmallButton
+        android:id="@+id/addSearchFeed"
+        android:layout_width="138dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:text="@string/search"
+        android:layout_marginBottom="10dp"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <com.jmw.rd.oddplay.widgets.SmallButton
+            android:id="@+id/cancelSearchFeed"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="@string/dismiss"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+    </RelativeLayout>
+
+
+</LinearLayout>

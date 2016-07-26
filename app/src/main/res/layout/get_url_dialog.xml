@@ -1,0 +1,84 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="800dp"
+    android:background="@drawable/border_line"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="41dp"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal"
+        android:text="@string/podcastUrl"
+        android:textAlignment="center"
+        android:textColor="@color/name"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <com.jmw.rd.oddplay.widgets.SmallButton
+        android:id="@+id/feedSearchButton"
+        android:layout_below="@id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:text="@string/feedSearch"
+        android:layout_marginBottom="5dp"/>
+
+    <com.jmw.rd.oddplay.widgets.SmallButton
+        android:id="@+id/urlDialogAdd"
+        android:text="@string/manuallEnterUrl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/feedSearchButton"
+        android:layout_gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="5dp"/>
+
+    <com.jmw.rd.oddplay.widgets.SmallButton
+        android:id="@+id/urlDialogPaste"
+        android:text="@string/pasteFromClipboard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/urlDialogAdd"
+        android:layout_gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="5dp"/>
+
+    <com.jmw.rd.oddplay.widgets.SmallButton
+        android:id="@+id/urlDialogScanQRCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/scanQRCode"
+        android:layout_below="@+id/urlDialogPaste"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="5dp"/>
+
+    <com.jmw.rd.oddplay.widgets.HiliteButton
+        android:id="@+id/quickStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/quickStart"
+        android:layout_below="@id/urlDialogScanQRCode"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="5dp"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/quickStart"
+        android:weightSum="1">
+        <com.jmw.rd.oddplay.widgets.SmallButton
+            android:id="@+id/urlDialogCancel"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:text="@string/dismiss" />
+    </RelativeLayout>
+</RelativeLayout>
