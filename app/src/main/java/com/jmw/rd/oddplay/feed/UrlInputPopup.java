@@ -33,6 +33,7 @@ public class UrlInputPopup extends PopupDialogFragment {
     private Context context;
     private FeedController feedController;
     private ClipboardManager clipboard;
+    private String showPopupUrlOnResume = null;
 
     public static UrlInputPopup newInstance() {
         UrlInputPopup popup = new UrlInputPopup();
@@ -117,10 +118,28 @@ public class UrlInputPopup extends PopupDialogFragment {
         }
     }
 
-    public void showEnterUrlPopup(String text) {
+    @Override
+    public synchronized void onResume() {
+        super.onResume();
+        if (showPopupUrlOnResume != null) {
+            showUrlInputPopup(showPopupUrlOnResume);
+            showPopupUrlOnResume = null;
+        }
+    }
+
+    private void showUrlInputPopup(String text) {
         FeedUrlStringPopup popup = FeedUrlStringPopup.newInstance(text);
         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
         popup.show(transaction, "enterURL");
+    }
+
+    public void showEnterUrlPopup(String text) {
+        if (this.isResumed()) {
+            showUrlInputPopup(showPopupUrlOnResume);
+            showPopupUrlOnResume = null;
+        } else {
+            showPopupUrlOnResume = text;
+        }
     }
 
     private class SearchFeedListener implements View.OnTouchListener {

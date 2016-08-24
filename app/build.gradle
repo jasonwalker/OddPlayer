@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 24 // 'android-L'
-    buildToolsVersion '21.1.2'
+    buildToolsVersion '23.0.3'
 
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES'
@@ -19,8 +19,9 @@ android {
         applicationId "com.jmw.rd.oddplayer"
         minSdkVersion 19 // 'L'
         targetSdkVersion 23
-        versionCode 10
-        versionName "1.1.8"
+        versionCode 11
+        versionName "1.1.9"
+        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
@@ -40,8 +41,8 @@ dependencies {
     compile 'joda-time:joda-time:2.3'
     compile 'ch.acra:acra:4.5.0'
     compile 'com.google.zxing:android-integration:3.1.0'
-    compile 'com.android.support:support-v13:24.0.0'
-    compile 'com.android.support:design:24.0.0'
+    compile 'com.android.support:support-v13:24.1.1'
+    compile 'com.android.support:design:24.1.1'
     compile 'com.nanohttpd:nanohttpd:2.1.1'
     compile 'org.jsoup:jsoup:1.8.3'
 }

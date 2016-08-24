@@ -73,7 +73,9 @@ public class FeedsViewPage extends PodPage {
 
     public synchronized void setUrlToAdd(String url) {
         if (this.isResumed()) {
-            feedController.broadcastAddFeed(url);
+            createInputDialog();
+            urlInputDialog.showEnterUrlPopup(url);
+            //feedController.broadcastAddFeed(url);
         } else {
             this.urlToAddOnResume = url;
         }
@@ -83,7 +85,9 @@ public class FeedsViewPage extends PodPage {
     public synchronized void onResume() {
         super.onResume();
         if (urlToAddOnResume != null) {
-            feedController.broadcastAddFeed(urlToAddOnResume);
+            //feedController.broadcastAddFeed(urlToAddOnResume);
+            createInputDialog();
+            urlInputDialog.showEnterUrlPopup(urlToAddOnResume);
             urlToAddOnResume = null;
         }
     }
@@ -149,12 +153,16 @@ public class FeedsViewPage extends PodPage {
         }
     }
 
+    private void createInputDialog() {
+        urlInputDialog = UrlInputPopup.newInstance();//new UrlInputDialog(myContext);
+        FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();
+        urlInputDialog.show(transaction, "urldialog");
+    }
+
     private void addFeed() {
         if (Utils.isDataOn(activity)) {
             if (PRODUCTION) {
-                urlInputDialog = UrlInputPopup.newInstance();//new UrlInputDialog(myContext);
-                FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();
-                urlInputDialog.show(transaction, "urldialog");
+                createInputDialog();
             } else {
                 String[] feedStrings = new String[7];
                 for (int i = 0; i < 7; i++) {

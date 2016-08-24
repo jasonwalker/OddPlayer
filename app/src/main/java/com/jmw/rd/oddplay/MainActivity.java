@@ -228,11 +228,15 @@ public class MainActivity extends AppCompatActivity implements
         }
         setIntent(null);
         String url = null;
-        for (String extra : new String[]{"www.subscribeonandroid.com/", "subscribeonandroid.com/"}) {
-            int index = dataString.indexOf(extra);
-            if (index != -1) {
-                url = dataString.replace(extra, "");
-                break;
+        if (dataString.toLowerCase().startsWith("podcast://")) {
+            url = dataString.substring("podcast://".length());
+        } else {
+            for (String extra : new String[]{"www.subscribeonandroid.com/", "subscribeonandroid.com/"}) {
+                int index = dataString.indexOf(extra);
+                if (index != -1) {
+                    url = dataString.replace(extra, "");
+                    break;
+                }
             }
         }
         if (url != null) {
