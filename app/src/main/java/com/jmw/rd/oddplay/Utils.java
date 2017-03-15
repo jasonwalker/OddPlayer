@@ -114,12 +114,7 @@ public class Utils {
     public static String getBuildTime (Context context) {
         String buildTime = "";
         try  {
-            ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), 0);
-            ZipFile zf = new ZipFile(ai.sourceDir);
-            ZipEntry ze = zf.getEntry("classes.dex");
-            long time = ze.getTime();
-            zf.close();
-            buildTime = dateStringFromLong(time);
+            buildTime = dateStringFromLong(BuildConfig.TIMESTAMP);
         } catch (Exception e) {
             //just return empty string
         }

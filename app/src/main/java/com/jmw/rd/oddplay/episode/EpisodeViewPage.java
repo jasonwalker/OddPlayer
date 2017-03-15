@@ -236,7 +236,7 @@ public class EpisodeViewPage extends PodPage implements EpisodeListAdapter.Episo
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                FilterDisplayAnimation animation = new FilterDisplayAnimation(activity, episodeFilter, episodeFilterText, 160,
+                FilterDisplayAnimation animation = new FilterDisplayAnimation(activity, episodeFilter, episodeFilterText, 260,
                         episodeFilter.getLayoutParams());
                 animation.runAnimation();
             }
