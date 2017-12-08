@@ -2,7 +2,6 @@ package com.jmw.rd.oddplay.feed;
 
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -17,6 +16,7 @@ import com.jmw.rd.oddplay.R;
 import com.jmw.rd.oddplay.widgets.PopupDialogFragment;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,9 +50,13 @@ public class FeedsSearchPopup extends PopupDialogFragment implements FeedsSearch
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        Window window = getDialog().getWindow();
+        if (window == null) {
+            throw new RuntimeException("Couldnot get window for feeds search popup.  Something is wrong with your phone");
+        }
+        window.requestFeature(Window.FEATURE_NO_TITLE);
         @SuppressLint("InflateParams")
-        final View dialogLayout = ((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.feeds_search_detail, null);
+        final View dialogLayout = inflater.inflate(R.layout.feeds_search_detail, null);
         ListView feedsList = (ListView) dialogLayout.findViewById(R.id.feedsList);
 
         feedsList.setAdapter(adapter);
@@ -63,14 +67,18 @@ public class FeedsSearchPopup extends PopupDialogFragment implements FeedsSearch
         TextView searchTermView = (TextView) dialogLayout.findViewById(R.id.searchTermText);
         searchTermView.setText(this.searchString);
         feedController = new FeedController(getActivity());
-        GetSearch search = new GetSearch(searchString);
+        GetSearch search = new GetSearch(this, searchString);
         search.execute();
         return dialogLayout;
     }
 
-    class GetSearch extends AsyncTask<Void, List<FeedSearchItem>, Void> {
+    static class GetSearch extends AsyncTask<Void, List<FeedSearchItem>, Void> {
         private final String keywords;
-        public GetSearch(String keywords){
+        private WeakReference<FeedsSearchPopup> popupRef;
+
+
+        GetSearch(FeedsSearchPopup popup, String keywords) {
+            this.popupRef = new WeakReference<>(popup);
             this.keywords = keywords;
         }
 
@@ -88,8 +96,11 @@ public class FeedsSearchPopup extends PopupDialogFragment implements FeedsSearch
                 publishProgress(items);
             } else {
                 try {
-                    List<FeedSearchItem> newFeeds = searcher.searchFeeds(keywords);
-                    publishProgress(newFeeds);
+                    FeedsSearchPopup popup = popupRef.get();
+                    if (popup != null) {
+                        List<FeedSearchItem> newFeeds = popup.searcher.searchFeeds(keywords);
+                        publishProgress(newFeeds);
+                    }
                 } catch (IOException e) {
                     //TODO
                 }
@@ -102,10 +113,13 @@ public class FeedsSearchPopup extends PopupDialogFragment implements FeedsSearch
         @SafeVarargs
         @Override
         protected final void onProgressUpdate(List<FeedSearchItem>... newFeeds) {
-            for (List<FeedSearchItem> newFeed : newFeeds) {
-                adapter.addAll(newFeed);
+            FeedsSearchPopup popup = popupRef.get();
+            if (popup != null) {
+                for (List<FeedSearchItem> newFeed : newFeeds) {
+                    popup.adapter.addAll(newFeed);
+                }
+                popup.adapter.notifyDataSetChanged();
             }
-            adapter.notifyDataSetChanged();
         }
     }
 

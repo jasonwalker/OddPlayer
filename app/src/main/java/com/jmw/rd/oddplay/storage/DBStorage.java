@@ -499,9 +499,9 @@ public class DBStorage extends Storage {
     }
 
     private static class IDAndLocation {
-        public final String ID;
+        final String ID;
         public final String location;
-        public IDAndLocation(int ID, String location) {
+        IDAndLocation(int ID, String location) {
             this.ID = Integer.toString(ID);
             this.location = location;
         }
@@ -663,7 +663,7 @@ public class DBStorage extends Storage {
         }
     }
 
-    private String convertURLToFileName(String url) {
+    private String convertURLToFileName(String url) throws ResourceAllocationException{
         try {
             if (url == null) {
                 return "";
@@ -672,7 +672,7 @@ public class DBStorage extends Storage {
             md.update(url.getBytes("UTF-8"));
             return bytesToHex(md.digest());
         } catch (Exception e) {
-            return null;
+            throw new ResourceAllocationException(e.getMessage());
         }
     }
 
@@ -757,7 +757,7 @@ public class DBStorage extends Storage {
         private final File[] allFiles;
         private int currentEpisode;
         private final boolean onlyMetaData;
-        public DumpInfoIterator(boolean onlyMetaData) throws IOException, ResourceAllocationException{
+        DumpInfoIterator(boolean onlyMetaData) throws IOException, ResourceAllocationException{
             this.onlyMetaData = onlyMetaData;
             infoList.add(new DumpInfo(ODDPLAY_DB, new FileInputStream(context.getDatabasePath(ODDPLAY_DB))));
             InputStream prefsStream = new ByteArrayInputStream(DBStorage.this.getPrefsAsString().getBytes());
@@ -802,7 +802,7 @@ public class DBStorage extends Storage {
 
     private class EpisodeDB extends SQLiteOpenHelper implements AutoCloseable {
 
-        public EpisodeDB(Context context) {
+        EpisodeDB(Context context) {
             super(context.getApplicationContext(), ODDPLAY_DB, null, VERSION);
 
         }

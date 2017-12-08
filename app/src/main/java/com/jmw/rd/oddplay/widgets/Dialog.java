@@ -3,6 +3,7 @@ package com.jmw.rd.oddplay.widgets;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.view.Window;
 
 import com.jmw.rd.oddplay.R;
 
@@ -16,7 +17,11 @@ public class Dialog {
                     }
                 });
         AlertDialog dialog = builder.create();
-        dialog.getWindow().getAttributes().windowAnimations = R.style.dialogSlide;
+        Window window = dialog.getWindow();
+        if (window == null) {
+            throw new RuntimeException("Could not get dialog window, problem with phone");
+        }
+        window.getAttributes().windowAnimations = R.style.dialogSlide;
         dialog.show();
         return dialog;
     }
@@ -29,7 +34,11 @@ public class Dialog {
                 .setNegativeButton(context.getString(R.string.no), onNo);
 
         AlertDialog dialog = builder.create();
-        dialog.getWindow().getAttributes().windowAnimations = R.style.dialogSlide;
+        Window window = dialog.getWindow();
+        if (window == null) {
+            throw new RuntimeException("Could not get dialog window, problem with phone");
+        }
+        window.getAttributes().windowAnimations = R.style.dialogSlide;
         dialog.show();
         return dialog;
     }

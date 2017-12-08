@@ -53,7 +53,7 @@ public class SeekBarWrapper {
     private class MySeekListener implements SeekBar.OnSeekBarChangeListener {
         private final SeekListener listener;
 
-        public MySeekListener(SeekListener listener) {
+        MySeekListener(SeekListener listener) {
             this.listener = listener;
         }
 

@@ -7,15 +7,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.jmw.rd.oddplay.AmountSentCommunicator;
-import com.jmw.rd.oddplay.HttpConnection;
 import com.jmw.rd.oddplay.Utils;
 import com.jmw.rd.oddplay.episode.EpisodeController;
 import com.jmw.rd.oddplay.storage.Episode;
@@ -89,7 +86,7 @@ public class DownloadService extends IntentService {
 
         private final List<Episode> episodes;
 
-        public EpisodeAccumulator(){
+        EpisodeAccumulator(){
             episodes = new ArrayList<>();
         }
 
@@ -110,16 +107,19 @@ public class DownloadService extends IntentService {
     @Override
     public void onHandleIntent(Intent intent) {
         if (intent != null) {
-            switch (intent.getAction()) {
-                case DownloadController.DOWNLOAD_FULL_SERVICE:
-                    emergencyStopException = null;
-                    downloadAll();
-                    break;
-                case DownloadController.DOWNLOAD_PROVIDED_EPISODES:
-                    emergencyStopException = null;
-                    List<Episode> episodes = intent.getParcelableArrayListExtra(DownloadController.DOWNLOAD_EPISODES);
-                    downloadSome(episodes);
-                    break;
+            String action = intent.getAction();
+            if (action != null) {
+                switch (intent.getAction()) {
+                    case DownloadController.DOWNLOAD_FULL_SERVICE:
+                        emergencyStopException = null;
+                        downloadAll();
+                        break;
+                    case DownloadController.DOWNLOAD_PROVIDED_EPISODES:
+                        emergencyStopException = null;
+                        List<Episode> episodes = intent.getParcelableArrayListExtra(DownloadController.DOWNLOAD_EPISODES);
+                        downloadSome(episodes);
+                        break;
+                }
             }
         }
     }
@@ -132,6 +132,9 @@ public class DownloadService extends IntentService {
         int successfulDownloads = 0;
         startForeground(1992, new Notification());
         PowerManager mgr = (PowerManager) DownloadService.this.getSystemService(POWER_SERVICE);
+        if (mgr == null) {
+            throw new RuntimeException("Cannot get power manager");
+        }
         PowerManager.WakeLock wakeLock = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock");
         wakeLock.acquire();
         try {
@@ -198,7 +201,11 @@ public class DownloadService extends IntentService {
             wakeLock.release();
             stopForeground(true);
             DownloadService.this.stopSelf();
-            unregisterReceiver(connectivityChange);
+            try {
+                unregisterReceiver(connectivityChange);
+            } catch (Exception e) {
+                // just eat exception, can't do anything here
+            }
         }
     }
 
@@ -227,6 +234,7 @@ public class DownloadService extends IntentService {
         int downloadsSucceeded = 0;
         startForeground(1993, new Notification());
         PowerManager mgr = (PowerManager) DownloadService.this.getSystemService(POWER_SERVICE);
+
         PowerManager.WakeLock wakeLock = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock");
         wakeLock.acquire();
         try {
@@ -252,7 +260,11 @@ public class DownloadService extends IntentService {
             wakeLock.release();
             stopForeground(true);
             DownloadService.this.stopSelf();
-            unregisterReceiver(connectivityChange);
+            try {
+                unregisterReceiver(connectivityChange);
+            } catch (Exception e) {
+                // just eat exception, can't do anything here
+            }
         }
     }
 
@@ -312,7 +324,7 @@ public class DownloadService extends IntentService {
         private final Episode episode;
         private final Feed feed;
 
-        public EpisodeWithFeed(Episode episode, Feed feed) {
+        EpisodeWithFeed(Episode episode, Feed feed) {
             this.episode = episode;
             this.feed = feed;
         }
@@ -333,13 +345,13 @@ public class DownloadService extends IntentService {
     }
 
     private class DownloadCommunicator implements AmountSentCommunicator {
-        public static final float contentDivisor = 1000000;
+        static final float contentDivisor = 1000000;
         private final Episode episode;
         private final String contentLengthString;
         private final String numberInDownloadQueue;
         private final String totalInDownloadQueue;
 
-        public DownloadCommunicator(Episode episode, int contentLength, int numberInDownloadQueue, int totalInDownloadQueue) {
+        DownloadCommunicator(Episode episode, int contentLength, int numberInDownloadQueue, int totalInDownloadQueue) {
             this.episode = episode;
             this.contentLengthString = numFormatter.format((contentLength > 0 ? contentLength : episode.getAudioSize()) / contentDivisor);
             this.numberInDownloadQueue = Integer.toString(numberInDownloadQueue);

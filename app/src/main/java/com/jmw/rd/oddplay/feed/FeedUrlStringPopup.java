@@ -38,9 +38,13 @@ public class FeedUrlStringPopup extends PopupDialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        Window window = getDialog().getWindow();
+        if (window == null) {
+            throw new RuntimeException("Cannot get window for feed url string popup.  Something is wrong with your phone");
+        }
+        window.requestFeature(Window.FEATURE_NO_TITLE);
         @SuppressLint("InflateParams")
-        final View dialogLayout = ((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.feeds_enter_url_string, null);
+        final View dialogLayout = inflater.inflate(R.layout.feeds_enter_url_string, null);
         Button submitUrlButton = (Button) dialogLayout.findViewById(R.id.submitUrlButton);
         submitUrlButton.setOnTouchListener(new OnSubmitUrl());
         enteredUrl = (EditText) dialogLayout.findViewById(R.id.enteredURL);

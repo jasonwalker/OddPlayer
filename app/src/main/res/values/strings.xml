@@ -79,7 +79,7 @@
     <string name="parsedEpisode">Parsed Episode: %1$s</string>
     <string name="confirmChangeStorage">Changing the storage location will take some time as all of the downloaded files will need to be copied to the new location.  Are you sure you want to proceed?</string>
     <string name="notValidNumber">The value: %1$s is not a valid number.  Please change.</string>
-    <string name="movingFile">Moving file %1$s of %2$s</string>
+    <string name="movingFile">Moving file %1$d of %2$d</string>
     <string name="preparingToMoveFile">Preparing to move %1$d files</string>
     <string name="completedMovingFile">Completed moving %1$d files</string>
     <string name="fileMoveFailed">File move failed: %1$s</string>
@@ -172,7 +172,7 @@
     <string name="cancel">Cancel</string>
     <string name="dailyDownloadTime">Daily Download Time</string>
     <string name="feedIconDescription">Feed icon</string>
-    <string name="couldNotMoveFiles">"Could not move files: %1$s: "</string>
+    <string name="couldNotMoveFiles">"Could not move files: %1$s"</string>
     <string name="sureAboutAddingPodcasts">Are you sure that you would like to add the new podcasts: %s?</string>
     <string name="noNewPodcastsToAdd">There were no new podcasts to add.</string>
     <string name="dataOrWifiMustBeEnabled">Data/Wifi must be enabled to download</string>

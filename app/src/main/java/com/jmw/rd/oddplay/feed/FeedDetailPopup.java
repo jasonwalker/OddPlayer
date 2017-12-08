@@ -31,6 +31,8 @@ import com.jmw.rd.oddplay.storage.Storage;
 import com.jmw.rd.oddplay.storage.StorageUtil;
 import com.jmw.rd.oddplay.widgets.PopupDialogFragment;
 
+import java.lang.ref.WeakReference;
+
 public class FeedDetailPopup extends PopupDialogFragment {
 
     private static final String FEED_KEY = "feed";
@@ -71,9 +73,13 @@ public class FeedDetailPopup extends PopupDialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        Window window = getDialog().getWindow();
+        if (window == null) {
+            throw new RuntimeException("Cannot get feed detail window.  Something is wrong with your phone");
+        }
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         @SuppressLint("InflateParams")
-        final View dialogLayout = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.feed_detail, null);
+        final View dialogLayout = inflater.inflate(R.layout.feed_detail, null);
         feedImage = (ImageView) dialogLayout.findViewById(R.id.feedDetailImage);
         TextView titleView = (TextView) dialogLayout.findViewById(R.id.feedDetailTitle);
         titleView.setText(this.feed.getTitle());
@@ -98,25 +104,37 @@ public class FeedDetailPopup extends PopupDialogFragment {
         skipLastText.addTextChangedListener(new SkipLastSecondsListener());
         Button feedDetailCancelButton = (Button) dialogLayout.findViewById(R.id.feedDetailCancelButton);
         feedDetailCancelButton.setOnTouchListener(new OnCancelClickListener());
-        PopulateViewTask populate =new PopulateViewTask();
+        PopulateViewTask populate =new PopulateViewTask(this);
         populate.execute();
         return dialogLayout;
     }
 
-    private class PopulateViewTask extends AsyncTask<Void, Object, Void> {
+    private static class PopulateViewTask extends AsyncTask<Void, Object, Void> {
         private String numberEpisodes;
         private Bitmap bitmap;
+        private WeakReference<FeedDetailPopup> popupRef;
+
+        PopulateViewTask(FeedDetailPopup popup) {
+            popupRef = new WeakReference<>(popup);
+        }
+
         @Override
         protected Void doInBackground(Void... unused) {
-            bitmap = ImageHolder.getImageFromFeedUrl(storage, feed.getUrl());
-            numberEpisodes = String.format(context.getString(R.string.numberEpisodes), storage.getNumberEpisodesForFeed(feed.getUrl()));
+            FeedDetailPopup popup = popupRef.get();
+            if (popup != null) {
+                bitmap = ImageHolder.getImageFromFeedUrl(popup.storage, popup.feed.getUrl());
+                numberEpisodes = String.format(popup.context.getString(R.string.numberEpisodes), popup.storage.getNumberEpisodesForFeed(popup.feed.getUrl()));
+            }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
-            feedImage.setImageBitmap(bitmap);
-            numberEpisodesView.setText(numberEpisodes);
+            FeedDetailPopup popup = popupRef.get();
+            if (popup != null) {
+                popup.feedImage.setImageBitmap(bitmap);
+                popup.numberEpisodesView.setText(numberEpisodes);
+            }
         }
     }
 

@@ -25,6 +25,10 @@ public class MoveProgressDialog  extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Window window = getDialog().getWindow();
+        if (window == null) {
+            throw new RuntimeException("Cannot get Move progress dialog.  Something is wrong with your phone");
+        }
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         View dialogLayout = inflater.inflate(R.layout.move_progress_dialog, container, false);
         fileCountView = (TextView) dialogLayout.findViewById(R.id.fileCountView);

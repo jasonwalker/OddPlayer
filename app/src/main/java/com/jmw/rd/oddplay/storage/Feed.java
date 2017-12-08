@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 public class Feed implements Parcelable,Serializable {
 
@@ -61,7 +62,7 @@ public class Feed implements Parcelable,Serializable {
     }
 
     public String toString() {
-        return String.format("Title: %s\nURL: %s\nDate Last Ep: %d\nCopyright: %s\nDescription: %s\n" +
+        return String.format(Locale.US, "Title: %s\nURL: %s\nDate Last Ep: %d\nCopyright: %s\nDescription: %s\n" +
                 "Language: %s\nImage: %s\nSkip first: %d\nSkip last: %d\nPrioritize: %b\n" +
                         "Disabled: %b",
                 title, url, lastEpisodeDate, copyright, description, language, this.getImageurl(),

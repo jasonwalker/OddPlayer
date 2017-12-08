@@ -21,19 +21,19 @@ class FeedsSearchAdapter extends BaseAdapter {
     private int numberFeedsSelected = 0;
     private final List<FeedsSelectCountListener> selectCountListeners;
 
-    public FeedsSearchAdapter(Context context) {
+    FeedsSearchAdapter(Context context) {
         this.context = context;
         items = new ArrayList<>();
         selectCountListeners = new ArrayList<>();
     }
 
-    public void addAll(List<FeedSearchItem> newItems) {
+    void addAll(List<FeedSearchItem> newItems) {
         for (FeedSearchItem item : newItems) {
             items.add(new FeedSelectedTracker(item));
         }
     }
 
-    public List<FeedSearchItem> getSelectedFeeds() {
+    List<FeedSearchItem> getSelectedFeeds() {
         final List<FeedSearchItem> feeds = new ArrayList<>();
         for (FeedSelectedTracker item : items) {
             if (item.selected) {
@@ -64,8 +64,10 @@ class FeedsSearchAdapter extends BaseAdapter {
         if (convertView == null) {
             LayoutInflater vi = (LayoutInflater) context.getSystemService(
                     Context.LAYOUT_INFLATER_SERVICE);
-            convertView = vi.inflate(R.layout.feeds_search_layout, null);
-
+            if (vi == null) {
+                throw new RuntimeException("Could not get layout inflater.  Something is wrong with your phone");
+            }
+            convertView = vi.inflate(R.layout.feeds_search_layout, viewGroup, false);
             holder = new ViewHolder();
             holder.feedSearchSelector = convertView.findViewById(R.id.feedSearchSelectClick);
             holder.feedTitle = (TextView) convertView.findViewById(R.id.searchFeedTitle);
@@ -100,7 +102,7 @@ class FeedsSearchAdapter extends BaseAdapter {
         final FeedSearchItem feed;
         boolean selected;
 
-        public FeedSelectedTracker(FeedSearchItem feed) {
+        private FeedSelectedTracker(FeedSearchItem feed) {
             this.feed = feed;
             this.selected = false;
         }
@@ -111,7 +113,7 @@ class FeedsSearchAdapter extends BaseAdapter {
 
         private final ViewHolder holder;
 
-        public FeedSelectClickListener(ViewHolder holder) {
+        private FeedSelectClickListener(ViewHolder holder) {
             this.holder = holder;
         }
 
@@ -131,11 +133,11 @@ class FeedsSearchAdapter extends BaseAdapter {
         }
     }
 
-    public void addSelectCountListener(FeedsSelectCountListener listener) {
+    void addSelectCountListener(FeedsSelectCountListener listener) {
         this.selectCountListeners.add(listener);
     }
 
-    public void removeSelectCountListener(FeedsSelectCountListener listener) {
+    void removeSelectCountListener(FeedsSelectCountListener listener) {
         this.selectCountListeners.remove(listener);
     }
 

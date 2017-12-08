@@ -16,6 +16,9 @@ public class Alarm extends BroadcastReceiver {
         cancel(context);
         if (minutesFromMidnight > -1) {
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            if (alarmManager == null) {
+                throw new RuntimeException("Cannot get phone's alarm manager");
+            }
             Intent notificationIntent = new Intent(context, Alarm.class);
             PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, notificationIntent, 0);
             Calendar calendar = Calendar.getInstance();
@@ -33,6 +36,9 @@ public class Alarm extends BroadcastReceiver {
 
     public static void cancel(Context context) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager == null) {
+            throw new RuntimeException("Cannot get phone's alarm manager");
+        }
         Intent notificationIntent = new Intent(context, Alarm.class);
         PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, notificationIntent, 0);
         alarmManager.cancel(alarmIntent);

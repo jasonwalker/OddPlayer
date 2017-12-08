@@ -303,7 +303,7 @@ public class EpisodeViewPage extends PodPage implements EpisodeListAdapter.Episo
 
         @Override
         protected void onPostExecute(Void result) {
-            episodeAdapter.getSelectedEpisodes(true);
+            episodeAdapter.getSelectedEpisodes();
             episodeAdapter.resetNumberSelected();
             episodeAdapter.runFilter(new FilterFinishedListener());
             episodeAdapter.resetNumberSelected();
@@ -325,7 +325,7 @@ public class EpisodeViewPage extends PodPage implements EpisodeListAdapter.Episo
                 for (int i = deletedNumber-1 ; i >= 0 ; i--) {
                     episodeAdapter.remove(i);
                 }
-                episodeAdapter.getSelectedEpisodes(true);
+                episodeAdapter.getSelectedEpisodes();
                 episodeAdapter.resetNumberSelected();
             } else if (intent.getBooleanExtra(EpisodeController.EPISODE_DELETED, false)) {
                 int deletedNumber = intent.getIntExtra(EpisodeController.EPISODE_NUMBER, -1);

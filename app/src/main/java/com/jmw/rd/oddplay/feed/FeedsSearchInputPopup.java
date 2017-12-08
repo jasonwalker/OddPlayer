@@ -29,9 +29,13 @@ public class FeedsSearchInputPopup extends PopupDialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        Window window = getDialog().getWindow();
+        if (window == null) {
+            throw new RuntimeException("Could not get window for feed search popup.  Something is wrong with your phone");
+        }
+        window.requestFeature(Window.FEATURE_NO_TITLE);
         @SuppressLint("InflateParams")
-        final View dialogLayout = ((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.search_feed_input_dialog, null);
+        final View dialogLayout = inflater.inflate(R.layout.search_feed_input_dialog, null);
         SmallButton searchFeedButton = (SmallButton) dialogLayout.findViewById(R.id.addSearchFeed);
         searchFeedButton.setOnTouchListener(new SearchForTerm());
 

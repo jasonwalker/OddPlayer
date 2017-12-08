@@ -8,16 +8,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class FeedsSearchDigitalPodcast implements FeedsSearch {
 
     private static final String address = "http://api.digitalpodcast.com/v2r/search/?appid=%s&results=10&sort=rel&format=rss&keywords=%s&start=%d&results=%d";
     private static final String appId = "";//go to http://api.digitalpodcast.com/get_appid.html to get an application ID
 
+
     private String searchString;
 
     private static String getUrl(String searchString, int offset, int amount) {
-        return String.format(address, appId, searchString, offset, amount);
+        return String.format(Locale.US, address, appId, searchString, offset, amount);
     }
 
     public List<FeedSearchItem> searchFeeds(String searchString) throws IOException {
@@ -43,7 +45,7 @@ public class FeedsSearchDigitalPodcast implements FeedsSearch {
 
 
     private static class SearchFeedUrlRule extends DefaultRule<List<FeedSearchItem>> {
-        public SearchFeedUrlRule() {
+        SearchFeedUrlRule() {
             super(Type.CHARACTER, "/rss/channel/item/source");
         }
 
@@ -54,7 +56,7 @@ public class FeedsSearchDigitalPodcast implements FeedsSearch {
     }
 
     private static class SearchFeedTitleRule extends DefaultRule<List<FeedSearchItem> > {
-        public SearchFeedTitleRule() {
+        SearchFeedTitleRule() {
             super(Type.CHARACTER, "/rss/channel/item/title");
         }
 
@@ -65,7 +67,7 @@ public class FeedsSearchDigitalPodcast implements FeedsSearch {
     }
 
     private static class SearchFeedDescriptionRule extends DefaultRule<List<FeedSearchItem> > {
-        public SearchFeedDescriptionRule() {
+        SearchFeedDescriptionRule() {
             super(Type.CHARACTER, "/rss/channel/item/description");
         }
 
@@ -76,7 +78,7 @@ public class FeedsSearchDigitalPodcast implements FeedsSearch {
     }
 
     private class SearchFeedTagOpenRule extends DefaultRule<List<FeedSearchItem>> {
-        public SearchFeedTagOpenRule() {
+        SearchFeedTagOpenRule() {
             super(Type.TAG, "/rss/channel/item");
         }
 

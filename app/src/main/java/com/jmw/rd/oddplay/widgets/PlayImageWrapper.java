@@ -46,7 +46,7 @@ public class PlayImageWrapper implements View.OnTouchListener {
         return this.playState;
     }
 
-    public void setPlaying(boolean playing, boolean animate) {
+    public void setPlaying(boolean playing) {
         if (noStateInfoYet) {
             noStateInfoYet = false;
             pausePlayImage.clearColorFilter();
@@ -57,9 +57,9 @@ public class PlayImageWrapper implements View.OnTouchListener {
         playState = playing;
         pausePlayImage.setImageBitmap(playing ? pauseBitmap : playBitmap);
         if (playing) {
-            buttonBackgroundTransition.startTransition(animate ? TRANSITION_TIME_MS : 0);
+            buttonBackgroundTransition.startTransition(TRANSITION_TIME_MS);
         } else {
-            buttonBackgroundTransition.reverseTransition(animate ? TRANSITION_TIME_MS : 0);
+            buttonBackgroundTransition.reverseTransition(TRANSITION_TIME_MS);
         }
     }
 

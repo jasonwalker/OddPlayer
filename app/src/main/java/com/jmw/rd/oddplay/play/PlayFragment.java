@@ -16,7 +16,10 @@ import com.jmw.rd.oddplay.ImageHolder;
 import com.jmw.rd.oddplay.storage.Episode;
 import com.jmw.rd.oddplay.R;
 import com.jmw.rd.oddplay.Utils;
+import com.jmw.rd.oddplay.storage.Storage;
 import com.jmw.rd.oddplay.storage.StorageUtil;
+
+import java.lang.ref.WeakReference;
 
 public class PlayFragment extends Fragment {
     private int position;
@@ -64,39 +67,52 @@ public class PlayFragment extends Fragment {
         description = (TextView) view.findViewById(R.id.playDisplay);
         ScrollingMovementMethod scrollFragment = new ScrollingMovementMethod();
         description.setMovementMethod(scrollFragment);
-        PopulateViewTask populate = new PopulateViewTask();
+        PopulateViewTask populate = new PopulateViewTask(this);
         populate.execute();
         return view;
     }
 
-    private class PopulateViewTask extends AsyncTask<Void, Object, Void> {
+    private static class PopulateViewTask extends AsyncTask<Void, Object, Void> {
         private Bitmap image;
         private String dateString;
         private Episode episode;
+        private WeakReference<PlayFragment> fragRef;
+
+        private PopulateViewTask(PlayFragment fragment) {
+            this.fragRef = new WeakReference<>(fragment);
+        }
+
         @Override
         protected Void doInBackground(Void... unused) {
-            episode = StorageUtil.getStorage(getContext()).getEpisode(episodeId);
-            if (episode != null) {
-                publishProgress(episode);
-                dateString = Utils.dateStringFromLong(episode.getPublishDate());
-                publishProgress(dateString);
-                image = ImageHolder.getImageFromFeedUrl(StorageUtil.getStorage(getContext()), episode.getFeed());
-                publishProgress(image);
+            PlayFragment fragment = fragRef.get();
+            if (fragment != null) {
+                Storage storage = StorageUtil.getStorage(fragment.getContext());
+                episode = storage.getEpisode(fragment.episodeId);
+                if (episode != null) {
+                    publishProgress(episode);
+                    dateString = Utils.dateStringFromLong(episode.getPublishDate());
+                    publishProgress(dateString);
+                    image = ImageHolder.getImageFromFeedUrl(storage, episode.getFeed());
+                    publishProgress(image);
+                }
             }
             return null;
         }
 
         @Override
         protected void onProgressUpdate(Object... vals) {
-            for (Object val : vals) {
-                if (val instanceof Episode) {
-                    feedName.setText(Html.fromHtml(episode.getFeedTitle()));
-                    title.setText(Html.fromHtml(episode.getTitle()));
-                    description.setText(Html.fromHtml(episode.getDescription()));
-                } else if (val instanceof String) {
-                    feedDate.setText(dateString);
-                } else if (val instanceof Bitmap) {
-                    feedImage.setImageBitmap(image);
+            PlayFragment fragment = fragRef.get();
+            if (fragment != null) {
+                for (Object val : vals) {
+                    if (val instanceof Episode) {
+                        fragment.feedName.setText(Html.fromHtml(episode.getFeedTitle()));
+                        fragment.title.setText(Html.fromHtml(episode.getTitle()));
+                        fragment.description.setText(Html.fromHtml(episode.getDescription()));
+                    } else if (val instanceof String) {
+                        fragment.feedDate.setText(dateString);
+                    } else if (val instanceof Bitmap) {
+                        fragment.feedImage.setImageBitmap(image);
+                    }
                 }
             }
         }

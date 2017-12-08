@@ -2,30 +2,24 @@ package com.jmw.rd.oddplay;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-
 import com.jmw.rd.oddplay.download.EmergencyDownloadStopException;
 import com.jmw.rd.oddplay.storage.StorageUtil;
-
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 public class Utils {
     private static final DateTimeFormatter timeFormat = DateTimeFormat.forPattern("EEE, dd MMM yyyy HH:mm:ss");
@@ -37,8 +31,13 @@ public class Utils {
      * @param os output stream to write
      * @param sentListener a listener to periodically report amount written
      * @return long indicated total amount written
-     * @throws IOException
-     * @throws EmergencyDownloadStopException
+<<<<<<< HEAD
+     * @throws IOException thrown when problem with input or output stream
+     * @throws EmergencyDownloadStopException thrown when user stops download
+=======
+     * @throws IOException if can't read input or output stream
+     * @throws EmergencyDownloadStopException if user stops download
+>>>>>>> 15b7d753cfbb0fd5c4d2419f644aa972dd4dee62
      */
     public static long IsToOs(InputStream is, OutputStream os, AmountSentCommunicator sentListener)
             throws IOException, EmergencyDownloadStopException {
@@ -74,9 +73,9 @@ public class Utils {
         final long seconds = TimeUnit.MILLISECONDS.toSeconds(msTime);
         String formattedTime;
         if (hours > 0) {
-            formattedTime = String.format("%02d:%02d:%02d", hours, minutes % 60, seconds % 60);
+            formattedTime = String.format(Locale.US, "%02d:%02d:%02d", hours, minutes % 60, seconds % 60);
         } else {
-            formattedTime = String.format("%02d:%02d", minutes, seconds % 60);
+            formattedTime = String.format(Locale.US, "%02d:%02d", minutes, seconds % 60);
         }
         return formattedTime;
     }
@@ -87,6 +86,9 @@ public class Utils {
 
     public static boolean isDataOn(Context context) {
         ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connManager == null) {
+            throw new RuntimeException("Could not get connectivity manager.  Something is wrong with your phone");
+        }
         NetworkInfo wifiNetworkInfo = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         NetworkInfo ethernetNetworkInfo = connManager.getNetworkInfo(ConnectivityManager.TYPE_ETHERNET);
         if ((wifiNetworkInfo != null && wifiNetworkInfo.isConnected()) || (ethernetNetworkInfo != null && ethernetNetworkInfo.isConnected())) {
@@ -111,7 +113,7 @@ public class Utils {
             throw e;
         }
     }
-    public static String getBuildTime (Context context) {
+    public static String getBuildTime () {
         String buildTime = "";
         try  {
             buildTime = dateStringFromLong(BuildConfig.TIMESTAMP);

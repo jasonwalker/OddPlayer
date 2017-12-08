@@ -155,7 +155,7 @@ public class OldEpisodesPopup extends PopupDialogFragment implements EpisodeList
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             try {
-                ArrayList<Episode> episodesToDownload = episodeAdapter.getSelectedEpisodes(true);
+                ArrayList<Episode> episodesToDownload = episodeAdapter.getSelectedEpisodes();
                 downloadController.downloadSomeEpisodes(episodesToDownload);
                 dismiss();
                 Toast.makeText(getActivity(), String.format(getActivity().getString(R.string.currentlyDownloadingOld), episodesToDownload.size()), Toast.LENGTH_LONG).show();

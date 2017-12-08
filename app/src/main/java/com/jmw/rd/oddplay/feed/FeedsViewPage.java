@@ -39,12 +39,11 @@ import com.jmw.rd.oddplay.widgets.Dialog;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FeedsViewPage extends PodPage {
 
@@ -124,32 +123,49 @@ public class FeedsViewPage extends PodPage {
         deleteFeedButton = (Button) result.findViewById(R.id.deleteFeedButton);
         deleteFeedButton.setOnTouchListener(new DeleteFeedListener());
         deleteFeedButton.setEnabled(false);
-        PopulateFeedAdapterTask populate = new PopulateFeedAdapterTask();
+        PopulateFeedAdapterTask populate = new PopulateFeedAdapterTask(this);
         populate.execute();
         ListView feedList = (ListView) result.findViewById(R.id.feedList);
         feedAdapter = new FeedAdapter(feedList);
         return result;
     }
 
-    private class PopulateFeedAdapterTask extends AsyncTask<Void, Feed, Void> {
+    private static class PopulateFeedAdapterTask extends AsyncTask<Void, Feed, Void> {
+
+        private WeakReference<FeedsViewPage> pageRef;
+
+        PopulateFeedAdapterTask(FeedsViewPage page) {
+            pageRef = new WeakReference<>(page);
+        }
+
         @Override
         protected Void doInBackground(Void... unused) {
-            for(Feed feed : storage.getFeeds()) {
-                publishProgress(feed);
+            FeedsViewPage page = pageRef.get();
+            if (page != null) {
+                for (Feed feed : page.storage.getFeeds()) {
+                    publishProgress(feed);
+                }
             }
             return null;
         }
 
         @Override
         protected void onProgressUpdate(Feed... feeds) {
-            for(Feed feed : feeds) {
-                feedAdapter.addFeed(feed);
+            FeedsViewPage page = pageRef.get();
+            if (page != null) {
+                for (Feed feed : feeds) {
+                    page.feedAdapter.addFeed(feed);
+                }
             }
         }
 
         @Override
         protected void onPostExecute(Void result) {
-            feedAdapter.notifyDataSetChanged();
+
+            FeedsViewPage page = pageRef.get();
+            if (page != null) {
+                page.feedAdapter.notifyDataSetChanged();
+            }
         }
     }
 
@@ -180,7 +196,7 @@ public class FeedsViewPage extends PodPage {
     }
 
     private void addFeedUrlAsync(String... url) {
-        GetFeedTask testGetFeed = new GetFeedTask();
+        GetFeedTask testGetFeed = new GetFeedTask(this);
         testGetFeed.execute(url);
     }
 
@@ -224,7 +240,7 @@ public class FeedsViewPage extends PodPage {
             DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     if (which == DialogInterface.BUTTON_POSITIVE) {
-                        final DeleteFeedsTask deleteTask = new DeleteFeedsTask();
+                        final DeleteFeedsTask deleteTask = new DeleteFeedsTask(FeedsViewPage.this);
                         deleteTask.execute();
                     }
                 }
@@ -234,27 +250,32 @@ public class FeedsViewPage extends PodPage {
         }
     }
 
-    private class FeedNameNumber {
+    private static class FeedNameNumber {
         public final String name;
         public final int number;
-        public FeedNameNumber(String name, int number) {
+        FeedNameNumber(String name, int number) {
             this.name = name;
             this.number = number;
         }
     }
-    private class DeleteFeedsTask extends AsyncTask<Void, FeedNameNumber, Void> {
+    private static class DeleteFeedsTask extends AsyncTask<Void, FeedNameNumber, Void> {
         AlertDialog previousDialog;
-        public DeleteFeedsTask() {
+        WeakReference<FeedsViewPage> pageRef;
+        DeleteFeedsTask(FeedsViewPage page) {
+            pageRef = new WeakReference<>(page);
         }
 
         @Override
         protected Void doInBackground(Void... unused) {
-            List<FeedSelectedTracker> tracker = FeedsViewPage.this.feedAdapter.feedTracker;
-            for (int i = tracker.size() - 1; i >= 0; i--) {
-                if (tracker.get(i).selected) {
-                    String name = tracker.get(i).feed.getTitle();
-                    storage.deleteFeed(tracker.get(i).feed);
-                    publishProgress(new FeedNameNumber(name, i));
+            FeedsViewPage page = pageRef.get();
+            if (page != null) {
+                List<FeedSelectedTracker> tracker = page.feedAdapter.feedTracker;
+                for (int i = tracker.size() - 1; i >= 0; i--) {
+                    if (tracker.get(i).selected) {
+                        String name = tracker.get(i).feed.getTitle();
+                        page.storage.deleteFeed(tracker.get(i).feed);
+                        publishProgress(new FeedNameNumber(name, i));
+                    }
                 }
             }
 
@@ -263,52 +284,66 @@ public class FeedsViewPage extends PodPage {
 
         @Override
         protected void onProgressUpdate(FeedNameNumber... items) {
-            for (FeedNameNumber item : items) {
-                feedAdapter.deleteFeed(item.number);
-                feedAdapter.notifyDataSetChanged();
-                if (previousDialog != null && previousDialog.isShowing()) {
-                    previousDialog.dismiss();
+            FeedsViewPage page = pageRef.get();
+            if (page != null) {
+                for (FeedNameNumber item : items) {
+                    page.feedAdapter.deleteFeed(item.number);
+                    page.feedAdapter.notifyDataSetChanged();
+                    if (previousDialog != null && previousDialog.isShowing()) {
+                        previousDialog.dismiss();
+                    }
                 }
             }
         }
 
         @Override
         protected void onPostExecute(Void result) {
-            numberFeedsClicked = 0;
-            deleteFeedButton.setEnabled(false);
+            FeedsViewPage page = pageRef.get();
+            if (page != null) {
+                page.numberFeedsClicked = 0;
+                page.deleteFeedButton.setEnabled(false);
+            }
         }
     }
 
-    private class RefreshImagesTask extends AsyncTask<Void, String, Void> {
-        public RefreshImagesTask() {
+    private static class RefreshImagesTask extends AsyncTask<Void, String, Void> {
+        WeakReference<FeedsViewPage> pageRef;
+        public RefreshImagesTask(FeedsViewPage page) {
+            pageRef = new WeakReference<>(page);
         }
 
         @Override
         protected Void doInBackground(Void... unused) {
-            for (Feed feed : storage.getFeeds()) {
-                getImageForFeed(storage, feed);
+            FeedsViewPage page = pageRef.get();
+            if (page != null) {
+                for (Feed feed : page.storage.getFeeds()) {
+                    page.getImageForFeed(page.storage, feed);
+                }
             }
             return (null);
         }
 
         @Override
         protected void onProgressUpdate(String... item) {
-            Toast.makeText(activity, item[0], Toast.LENGTH_SHORT).show();
+            FeedsViewPage page = pageRef.get();
+            if (page != null) {
+                Toast.makeText(page.activity, item[0], Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
-    private class FeedInfo {
+    private static class FeedInfo {
         final Feed feed;
         final String info;
         final String url;
         final boolean isException;
-        public FeedInfo(Feed feed, String url, String info) {
+        FeedInfo(Feed feed, String url, String info) {
             this.feed = feed;
             this.info = info;
             this.url = url;
             this.isException = false;
         }
-        public FeedInfo(String info, String url, boolean isException) {
+        FeedInfo(String info, String url, boolean isException) {
             this.feed = null;
             this.url = url;
             this.info = info;
@@ -316,29 +351,35 @@ public class FeedsViewPage extends PodPage {
         }
     }
 
-    class GetFeedTask extends AsyncTask<String, FeedInfo, Void> {
+    static class GetFeedTask extends AsyncTask<String, FeedInfo, Void> {
         private AlertDialog previousDialog;
         private FeedInfo lastFeedInfo = null;
-        public GetFeedTask() {
+        private WeakReference<FeedsViewPage> pageRef;
+
+        GetFeedTask(FeedsViewPage page) {
+            pageRef = new WeakReference<>(page);
         }
 
         @Override
         protected Void doInBackground(String... urls) {
-            XMLGrabber grabber = new XMLGrabber();
-            for (String url : urls) {
-                try {
-                    publishProgress(new FeedInfo(String.format(activity.getString(R.string.attemptingToEnterFeed), url), url, false));
-                    Feed newFeed = grabber.getFeed(url);
-                    storage.putFeed(newFeed);
-                    getImageForFeed(storage, newFeed);
-                    publishProgress(new FeedInfo(newFeed, url, String.format(activity.getString(R.string.feedSuccessfullyEntered), newFeed.getTitle())));
-                    feedController.broadcastFeedAdded(url, true);
-                } catch (DuplicateException e) {
-                    publishProgress(new FeedInfo(String.format(activity.getString(R.string.duplicateFeed), e.getMessage()), url, true));
-                    feedController.broadcastFeedAdded(url, false);
-                } catch (Exception e) {
-                    publishProgress(new FeedInfo(String.format(activity.getString(R.string.feedHasMalformedXML), url), url, true));
-                    feedController.broadcastFeedAdded(url, false);
+            FeedsViewPage page = pageRef.get();
+            if (page != null) {
+                XMLGrabber grabber = new XMLGrabber();
+                for (String url : urls) {
+                    try {
+                        publishProgress(new FeedInfo(String.format(page.activity.getString(R.string.attemptingToEnterFeed), url), url, false));
+                        Feed newFeed = grabber.getFeed(url);
+                        page.storage.putFeed(newFeed);
+                        page.getImageForFeed(page.storage, newFeed);
+                        publishProgress(new FeedInfo(newFeed, url, String.format(page.activity.getString(R.string.feedSuccessfullyEntered), newFeed.getTitle())));
+                        page.feedController.broadcastFeedAdded(url, true);
+                    } catch (DuplicateException e) {
+                        publishProgress(new FeedInfo(String.format(page.activity.getString(R.string.duplicateFeed), e.getMessage()), url, true));
+                        page.feedController.broadcastFeedAdded(url, false);
+                    } catch (Exception e) {
+                        publishProgress(new FeedInfo(String.format(page.activity.getString(R.string.feedHasMalformedXML), url), url, true));
+                        page.feedController.broadcastFeedAdded(url, false);
+                    }
                 }
             }
             return (null);
@@ -346,14 +387,17 @@ public class FeedsViewPage extends PodPage {
 
         @Override
         protected void onProgressUpdate(FeedInfo... items) {
-            for (FeedInfo fi : items) {
-                if (previousDialog != null && previousDialog.isShowing() && (lastFeedInfo == null || !lastFeedInfo.isException)) {
-                    previousDialog.dismiss();
-                }
-                lastFeedInfo = fi;
-                previousDialog = Dialog.showOK(activity, fi.info);
-                if (fi.feed != null) {
-                    feedAdapter.addFeed(fi.feed);
+            FeedsViewPage page = pageRef.get();
+            if (page != null) {
+                for (FeedInfo fi : items) {
+                    if (previousDialog != null && previousDialog.isShowing() && (lastFeedInfo == null || !lastFeedInfo.isException)) {
+                        previousDialog.dismiss();
+                    }
+                    lastFeedInfo = fi;
+                    previousDialog = Dialog.showOK(page.activity, fi.info);
+                    if (fi.feed != null) {
+                        page.feedAdapter.addFeed(fi.feed);
+                    }
                 }
             }
 
@@ -361,25 +405,28 @@ public class FeedsViewPage extends PodPage {
 
         @Override
         protected void onPostExecute(Void result) {
-            if (previousDialog != null && previousDialog.isShowing() && (lastFeedInfo == null || !lastFeedInfo.isException)){
-                previousDialog.dismiss();
-            }
-            //TODO This feels like a hack
-            // if url input failed, reshow dialog with previous entry so user can fix it
-            if (lastFeedInfo != null && lastFeedInfo.isException) {
-                previousDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialogInterface) {
-                        if (urlInputDialog != null && urlInputDialog.isVisible()) {
-                            urlInputDialog.showEnterUrlPopup(lastFeedInfo.url);
-                        }
-                    }
-                });
-            } else {
-                if (lastFeedInfo != null) {
-                    Toast.makeText(activity, String.format("Successfully entered feed: %1$s", lastFeedInfo.feed.getTitle()), Toast.LENGTH_LONG).show();
+            final FeedsViewPage page = pageRef.get();
+            if (page != null) {
+                if (previousDialog != null && previousDialog.isShowing() && (lastFeedInfo == null || !lastFeedInfo.isException)) {
+                    previousDialog.dismiss();
                 }
-                feedAdapter.notifyDataSetChanged();
+                //TODO This feels like a hack
+                // if url input failed, reshow dialog with previous entry so user can fix it
+                if (lastFeedInfo != null && lastFeedInfo.isException) {
+                    previousDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialogInterface) {
+                            if (page.urlInputDialog != null && page.urlInputDialog.isVisible()) {
+                                page.urlInputDialog.showEnterUrlPopup(lastFeedInfo.url);
+                            }
+                        }
+                    });
+                } else {
+                    if (lastFeedInfo != null && lastFeedInfo.feed != null) {
+                        Toast.makeText(page.activity, String.format("Successfully entered feed: %1$s", lastFeedInfo.feed.getTitle()), Toast.LENGTH_LONG).show();
+                    }
+                    page.feedAdapter.notifyDataSetChanged();
+                }
             }
         }
     }
@@ -397,10 +444,10 @@ public class FeedsViewPage extends PodPage {
         final Feed feed;
         boolean selected;
         public Bitmap image;
-        public int numberEpisodes;
-        public ViewHolder holder;
+        int numberEpisodes;
+        ViewHolder holder;
 
-        public FeedSelectedTracker(Feed feed) {
+        FeedSelectedTracker(Feed feed) {
             this.feed = feed;
             this.selected = false;
         }
@@ -441,18 +488,18 @@ public class FeedsViewPage extends PodPage {
     private class FeedAdapter extends BaseAdapter {
         final List<FeedSelectedTracker> feedTracker;
 
-        public FeedAdapter(final ListView feedList) {
+        FeedAdapter(final ListView feedList) {
             super();
             this.feedTracker = new ArrayList<>();
             feedList.setAdapter(this);
             feedList.setOnItemClickListener(new ListClickListener());
         }
 
-        public void addFeed(final Feed feed) {
+        void addFeed(final Feed feed) {
             this.feedTracker.add(new FeedSelectedTracker(feed));
         }
 
-        public void deleteFeed(int position) {
+        void deleteFeed(int position) {
             this.feedTracker.remove(position);
         }
 
@@ -479,6 +526,9 @@ public class FeedsViewPage extends PodPage {
             if (convertView == null) {
                 LayoutInflater vi = (LayoutInflater) activity.getSystemService(
                         Context.LAYOUT_INFLATER_SERVICE);
+                if (vi == null) {
+                    throw new RuntimeException("Cannot get inflator for feeds view page.  Your phone has a problem.");
+                }
                 convertView = vi.inflate(R.layout.feeds_layout, null);
 
                 tracker.holder = new ViewHolder();
@@ -496,7 +546,7 @@ public class FeedsViewPage extends PodPage {
             tracker.holder.feedName.setText(tracker.feed.getTitle());
             tracker.holder.position = position;
             tracker.holder.checkbox.setChecked(tracker.selected);
-            new PopulateHolderTask().execute(tracker);
+            new PopulateHolderTask(FeedsViewPage.this).execute(tracker);
 
             if (tracker.feed.isDisabled()) {
                 convertView.setBackgroundColor(ContextCompat.getColor(activity, R.color.downloadedEpisodeInList));
@@ -507,32 +557,10 @@ public class FeedsViewPage extends PodPage {
             return convertView;
         }
 
-        private class PopulateHolderTask extends AsyncTask<FeedSelectedTracker, FeedSelectedTracker, Void> {
-
-            @Override
-            protected Void doInBackground(FeedSelectedTracker... trackers) {
-                for (FeedSelectedTracker tracker : trackers) {
-                    tracker.image = ImageHolder.getImageFromFeedUrl(storage, tracker.feed.getUrl());
-                    tracker.numberEpisodes = storage.getNumberEpisodesForFeed(tracker.feed.getUrl());
-                    publishProgress(tracker);
-                }
-                return null;
-            }
-            @Override
-            protected void onProgressUpdate(FeedSelectedTracker... trackers) {
-                for (FeedSelectedTracker tracker : trackers) {
-                    if (tracker.image != null) {
-                        tracker.holder.feedImage.setImageBitmap(tracker.image);
-                    }
-                    tracker.holder.numberEpisodes.setText(String.format(activity.getString(R.string.numberEpisodes), tracker.numberEpisodes));
-                }
-            }
-        }
-
         class FeedSelectClickListener implements View.OnClickListener {
             private final ViewHolder holder;
 
-            public FeedSelectClickListener(ViewHolder holder) {
+            FeedSelectClickListener(ViewHolder holder) {
                 this.holder = holder;
             }
 
@@ -559,6 +587,38 @@ public class FeedsViewPage extends PodPage {
                 FeedDetailPopup feedDetailPopup = FeedDetailPopup.newInstance(feedAdapter, feedTracker.get(position).feed);
                 FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();
                 feedDetailPopup.show(transaction, "dialog");
+            }
+        }
+    }
+    private static class PopulateHolderTask extends AsyncTask<FeedSelectedTracker, FeedSelectedTracker, Void> {
+
+        private WeakReference<FeedsViewPage> pageRef;
+        PopulateHolderTask(FeedsViewPage page) {
+            pageRef = new WeakReference<>(page);
+        }
+
+        @Override
+        protected Void doInBackground(FeedSelectedTracker... trackers) {
+            FeedsViewPage page = pageRef.get();
+            if (page != null) {
+                for (FeedSelectedTracker tracker : trackers) {
+                    tracker.image = ImageHolder.getImageFromFeedUrl(page.storage, tracker.feed.getUrl());
+                    tracker.numberEpisodes = page.storage.getNumberEpisodesForFeed(tracker.feed.getUrl());
+                    publishProgress(tracker);
+                }
+            }
+            return null;
+        }
+        @Override
+        protected void onProgressUpdate(FeedSelectedTracker... trackers) {
+            FeedsViewPage page = pageRef.get();
+            if (page != null) {
+                for (FeedSelectedTracker tracker : trackers) {
+                    if (tracker.image != null) {
+                        tracker.holder.feedImage.setImageBitmap(tracker.image);
+                    }
+                    tracker.holder.numberEpisodes.setText(String.format(page.activity.getString(R.string.numberEpisodes), tracker.numberEpisodes));
+                }
             }
         }
     }

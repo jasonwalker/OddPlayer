@@ -158,7 +158,7 @@ public abstract class SortableFragmentStatePagerAdapter extends PagerAdapter {
     /**
      * Create the initial set of item IDs. Run this after you have set your adapter data.
      */
-    public void createIdCache() {
+    private void createIdCache() {
         // If we have already stored ids, don't overwrite them
         if (mItemIds.length == 0) {
             // getCount might have overhead, so run it as late as possible
@@ -206,7 +206,7 @@ public abstract class SortableFragmentStatePagerAdapter extends PagerAdapter {
         fragment.setUserVisibleHint(false);
         mFragments.set(position, fragment);
         mCurTransaction.add(container.getId(), fragment);
-
+        mCurTransaction.commit();
         return fragment;
     }
 
@@ -226,6 +226,7 @@ public abstract class SortableFragmentStatePagerAdapter extends PagerAdapter {
         }
 
         mCurTransaction.remove(fragment);
+        mCurTransaction.commit();
     }
 
     @Override

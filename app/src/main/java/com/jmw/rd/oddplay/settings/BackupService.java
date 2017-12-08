@@ -23,8 +23,9 @@ public class BackupService extends IntentService {
     public static final int ERROR = -1;
     public static final String ERROR_STRING = "com.jmw.rd.oddplayer.ERROR_STRING";
     private static PowerManager.WakeLock wakeLock;
-    private static BackupFileServer backupServer;
+    private BackupFileServer backupServer;
     private ResultReceiver resultReceiver;
+    static private boolean isRunning = false;
 
     public BackupService() {
         super("BackupService");
@@ -33,6 +34,7 @@ public class BackupService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
+
             switch (intent.getAction()) {
                 case START_SERVER:
                     int port = intent.getIntExtra(BACKUP_PORT, 9999);
@@ -56,6 +58,7 @@ public class BackupService extends IntentService {
             wakeLock.acquire();
             backupServer = new BackupFileServer(this, StorageUtil.getStorage(this), port, resultReceiver);
             backupServer.start();
+            isRunning = true;
         } catch(IOException e) {
             if (resultReceiver != null) {
                 Bundle bundle = new Bundle();
@@ -68,6 +71,7 @@ public class BackupService extends IntentService {
     private void stopServer() {
         if (backupServer != null) {
             backupServer.stop();
+            isRunning = false;
             backupServer = null;
         }
         if (wakeLock != null) {
@@ -77,8 +81,8 @@ public class BackupService extends IntentService {
         BackupService.this.stopSelf();
     }
 
-    public static boolean isRunning() {
-        return backupServer != null;
+    static public boolean isRunning() {
+        return isRunning;
     }
 
 

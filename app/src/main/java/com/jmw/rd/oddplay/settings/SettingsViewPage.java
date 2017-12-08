@@ -37,7 +37,9 @@ import com.jmw.rd.oddplay.storage.StorageUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.Locale;
 
 
 public class SettingsViewPage extends PodPage {
@@ -95,11 +97,11 @@ public class SettingsViewPage extends PodPage {
         exportDataStopButton = (Button) fragmentLayout.findViewById(R.id.exportDataStopButton);
         exportDataStopButton.setOnTouchListener(new ExportDataStopListener());
         exportDataStopButton.setEnabled(false);
-        PopulateViewTask populate = new PopulateViewTask();
+        PopulateViewTask populate = new PopulateViewTask(this);
         populate.execute();
         return fragmentLayout;
     }
-    private class PopulateViewTask extends AsyncTask<Void, Void, Void> {
+    private static class PopulateViewTask extends AsyncTask<Void, Void, Void> {
         private String buildDate;
         private boolean onlyWifi;
         private boolean deleteAfter;
@@ -107,27 +109,38 @@ public class SettingsViewPage extends PodPage {
         private String maxDownloads;
         private String msToSkip;
         private List<String> storageOptions;
+        private WeakReference<SettingsViewPage> pageRef;
+
+        private PopulateViewTask(SettingsViewPage page) {
+            this.pageRef = new WeakReference<>(page);
+        }
 
         @Override
         protected Void doInBackground(Void... unused) {
-            buildDate = Utils.getBuildTime(activity);
-            onlyWifi = storage.fast.getUseOnlyWIFI();
-            deleteAfter = storage.fast.getDeleteAfterListening();
-            selectedStorage = storage.getSelectedStorage();
-            maxDownloads = Long.toString(storage.fast.getMaxDownloadsPerFeed());
-            msToSkip = Integer.toString(storage.fast.getSkipDistance());
-            storageOptions = storage.getStorageOptionsList(activity);
+            SettingsViewPage page = pageRef.get();
+            if (page != null) {
+                buildDate = Utils.getBuildTime();
+                onlyWifi = page.storage.fast.getUseOnlyWIFI();
+                deleteAfter = page.storage.fast.getDeleteAfterListening();
+                selectedStorage = page.storage.getSelectedStorage();
+                maxDownloads = Long.toString(page.storage.fast.getMaxDownloadsPerFeed());
+                msToSkip = Integer.toString(page.storage.fast.getSkipDistance());
+                storageOptions = page.storage.getStorageOptionsList(page.activity);
+            }
             return null;
         }
         @Override
         protected void onPostExecute(Void result) {
-            buildDateView.setText(buildDate);
-            useOnlyWIFI.setChecked(onlyWifi);
-            deleteAfterListening.setChecked(deleteAfter);
-            externalStorageSelector.setSelection(selectedStorage);
-            maxDownloadsPerFeed.setText(maxDownloads);
-            numberMsToSkipInput.setText(msToSkip);
-            storageSelector.addAll(storageOptions);
+            SettingsViewPage page = pageRef.get();
+            if (page != null) {
+                page.buildDateView.setText(buildDate);
+                page.useOnlyWIFI.setChecked(onlyWifi);
+                page.deleteAfterListening.setChecked(deleteAfter);
+                page.externalStorageSelector.setSelection(selectedStorage);
+                page.maxDownloadsPerFeed.setText(maxDownloads);
+                page.numberMsToSkipInput.setText(msToSkip);
+                page.storageSelector.addAll(storageOptions);
+            }
         }
     }
 
@@ -141,12 +154,12 @@ public class SettingsViewPage extends PodPage {
             int hour = minutes / 60;
             int minute = minutes % 60;
             if (DateFormat.is24HourFormat(activity)) {
-                time = String.format("%d:%02d", hour, minute);
+                time = String.format(Locale.US, "%d:%02d", hour, minute);
             } else {
                 if (hour > 12) {
-                    time = String.format("%d:%02d %s", hour - 12, minute, "pm");
+                    time = String.format(Locale.US,"%d:%02d %s", hour - 12, minute, "pm");
                 } else {
-                    time = String.format("%d:%02d %s", hour, minute, "am");
+                    time = String.format(Locale.US, "%d:%02d %s", hour, minute, "am");
                 }
             }
         }
@@ -167,14 +180,14 @@ public class SettingsViewPage extends PodPage {
         Utils.hideKeyboard(getActivity());
     }
 
-    class MoveData{
-        public final int overallTotal;
-        public final int overallProgress;
-        public final int fileTotal;
-        public final int fileProgress;
+    static class MoveData{
+        private final int overallTotal;
+        private final int overallProgress;
+        private final int fileTotal;
+        private final int fileProgress;
         public final String text;
 
-        public MoveData(int overallTotal, int overallProgress, int fileTotal, int fileProgress, String text) {
+        private MoveData(int overallTotal, int overallProgress, int fileTotal, int fileProgress, String text) {
             this.overallTotal = overallTotal;
             this.overallProgress = overallProgress;
             this.fileTotal = fileTotal;
@@ -183,13 +196,16 @@ public class SettingsViewPage extends PodPage {
         }
     }
 
-    class MoveFilesTask extends AsyncTask<Void, MoveData, Void> {
+    static class MoveFilesTask extends AsyncTask<Void, MoveData, Void> {
         File srcDir;
         File dstDir;
         int newPosition;
         MoveProgressDialog dialog;
+        WeakReference<SettingsViewPage> pageRef;
 
-        public MoveFilesTask(File srcDir, File dstDir, int newPosition, MoveProgressDialog dialog) {
+        private MoveFilesTask(SettingsViewPage page, File srcDir, File dstDir, int newPosition, MoveProgressDialog dialog) {
+            pageRef = new WeakReference<>(page);
+
             if (BuildConfig.DEBUG) {
                 if (!srcDir.isDirectory()) {
                     throw new RuntimeException("SrcDir must be a dir");
@@ -204,15 +220,13 @@ public class SettingsViewPage extends PodPage {
             this.dialog = dialog;
         }
 
-
-
         class FileSentListener implements AmountSentCommunicator {
 
             final int currNumber;
             final int total;
             final int fileSize;
 
-            public FileSentListener(int downloadNumber, int totalFiles, long fileSize){
+            private FileSentListener(int downloadNumber, int totalFiles, long fileSize){
                 this.currNumber = downloadNumber;
                 this.total = totalFiles;
                 this.fileSize = (int) fileSize;
@@ -236,19 +250,23 @@ public class SettingsViewPage extends PodPage {
 
         @Override
         protected Void doInBackground(Void... unused) {
+            SettingsViewPage page = pageRef.get();
+            if (page == null) {
+                return null;
+            }
             try {
                 File[] files = this.srcDir.listFiles();
                 for (int i = 0; i < files.length; i++) {
-                    publishProgress(new MoveData(0, 0, 0, 0, String.format(activity.getString(R.string.movingFile), i+1, files.length)));
-                    storage.moveFile(files[i], dstDir, new FileSentListener(i, files.length, files[i].length()));
+                    publishProgress(new MoveData(0, 0, 0, 0, String.format(page.activity.getString(R.string.movingFile), i+1, files.length)));
+                    page.storage.moveFile(files[i], dstDir, new FileSentListener(i, files.length, files[i].length()));
                 }
-                storage.setSelectedStorage(this.newPosition);
-                publishProgress(new MoveData(0, 0, 0, 0, String.format(activity.getString(R.string.completedMovingFile), files.length)));
+                page.storage.setSelectedStorage(this.newPosition);
+                publishProgress(new MoveData(0, 0, 0, 0, String.format(page.activity.getString(R.string.completedMovingFile), files.length)));
                 return null;
             }catch (IOException e) {
-                publishProgress(new MoveData(0, 0, 0, 0, String.format(activity.getString(R.string.fileMoveFailed), e.getMessage())));
+                publishProgress(new MoveData(0, 0, 0, 0, String.format(page.activity.getString(R.string.fileMoveFailed), e.getMessage())));
             }catch(EmergencyDownloadStopException e) {
-                Toast.makeText(activity, R.string.emergencyShutdown, Toast.LENGTH_LONG).show();
+                Toast.makeText(page.activity, R.string.emergencyShutdown, Toast.LENGTH_LONG).show();
             } finally {
                 this.dialog.dismiss();
             }
@@ -280,11 +298,11 @@ public class SettingsViewPage extends PodPage {
                     try {
                         FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();
                         popup.show(transaction, "dialog");
-                        final MoveFilesTask deleteTask = new MoveFilesTask(storage.getEpisodesDirForStoragePosition(storage.getSelectedStorage()),
+                        final MoveFilesTask deleteTask = new MoveFilesTask(SettingsViewPage.this, storage.getEpisodesDirForStoragePosition(storage.getSelectedStorage()),
                                 storage.getEpisodesDirForStoragePosition(position), position, popup);
                         deleteTask.execute();
                     } catch (ResourceAllocationException e){
-                        settingsInfo.setText(activity.getString(R.string.couldNotMoveFiles) + e.getMessage());
+                        settingsInfo.setText(String.format(activity.getString(R.string.couldNotMoveFiles), e.getMessage()));
                     }
                 }
             };

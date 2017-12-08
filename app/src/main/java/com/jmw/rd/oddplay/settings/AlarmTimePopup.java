@@ -37,9 +37,13 @@ public class AlarmTimePopup extends PopupDialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Window window = getDialog().getWindow();
+        if (window == null) {
+            throw new RuntimeException("Cannot get alarm time popup window.  Something is wrong with your phone");
+        }
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         @SuppressLint("InflateParams")
-        final View dialogLayout = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.set_download_time_dialog, null);
+        final View dialogLayout = inflater.inflate(R.layout.set_download_time_dialog, null);
         alarmTimePicker = (TimePicker) dialogLayout.findViewById(R.id.alarmTimePicker);
         Button applyAlarmTime = (Button) dialogLayout.findViewById(R.id.applyAlarmTimeButton);
         applyAlarmTime.setOnTouchListener(new SetAlarmTimeListener());

@@ -43,7 +43,7 @@ public class AudioHardwareRemoteControlReceiver extends BroadcastReceiver {
                 playController.fastforward();
                 break;
             default:
-                return;
+                break;
         }
     }
 

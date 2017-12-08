@@ -10,30 +10,45 @@ import android.support.v4.view.PagerAdapter;
 import com.jmw.rd.oddplay.storage.Storage;
 import com.jmw.rd.oddplay.storage.StorageUtil;
 
+import java.lang.ref.WeakReference;
+
 
 public class PlayPagerAdapter extends FragmentPagerAdapter {
     private final Storage storage;
     private volatile int bufferedCount = 0;
     private volatile Long[] allIds;
 
-    public PlayPagerAdapter(FragmentManager mgr, Context context) {
+    PlayPagerAdapter(FragmentManager mgr, Context context) {
         super(mgr);
         this.storage = StorageUtil.getStorage(context);
-        new CacheDataTask().execute();
+        new CacheDataTask(this).execute();
     }
 
 
-    private class CacheDataTask extends AsyncTask<Void, Object, Void> {
+    private static class CacheDataTask extends AsyncTask<Void, Object, Void> {
+        WeakReference<PlayPagerAdapter> adapterRef;
+
+        private CacheDataTask(PlayPagerAdapter adapter) {
+            adapterRef = new WeakReference<>(adapter);
+        }
+
         @Override
         protected Void doInBackground(Void... unused) {
-            allIds = storage.getAllIds();
-            bufferedCount = allIds.length;
+            PlayPagerAdapter adapter = adapterRef.get();
+            if (adapter != null) {
+                adapter.allIds = adapter.storage.getAllIds();
+                adapter.bufferedCount = adapter.allIds.length;
+            }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
-            PlayPagerAdapter.super.notifyDataSetChanged();
+
+            PlayPagerAdapter adapter = adapterRef.get();
+            if (adapter != null) {
+                adapter.superNotifyDataSetChanged();
+            }
         }
     }
 
@@ -95,6 +110,10 @@ public class PlayPagerAdapter extends FragmentPagerAdapter {
         }
         fragment.setPosition(location);
         return location;
+    }
+
+    private void superNotifyDataSetChanged() {
+        super.notifyDataSetChanged();
     }
 
     @Override

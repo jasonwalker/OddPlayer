@@ -21,14 +21,14 @@ public class FeedSearchItem implements Parcelable {
     private String title;
     private String description;
 
-    public FeedSearchItem() {
+    FeedSearchItem() {
         url = "";
         title = "";
         description = "";
     }
 
 
-    public FeedSearchItem(Parcel pc) {
+    FeedSearchItem(Parcel pc) {
         url = pc.readString();
         title = pc.readString();
         description = pc.readString();

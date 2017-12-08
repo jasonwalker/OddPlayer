@@ -40,7 +40,7 @@ class EpisodeListAdapter extends BaseAdapter implements Filterable {
      * @param highlightCurrentEpisode make current episode's color different from others
      * @param disableExistingEpisodes disable clicking on episodes that can be found in db
      */
-    public EpisodeListAdapter(Context context,
+    EpisodeListAdapter(Context context,
                               boolean highlightCurrentEpisode, boolean disableExistingEpisodes,
                               boolean showDuration) {
         super();
@@ -55,7 +55,7 @@ class EpisodeListAdapter extends BaseAdapter implements Filterable {
         runFilter();
     }
 
-    public void addSelectCountListener(EpisodeSelectCountListener listener) {
+    void addSelectCountListener(EpisodeSelectCountListener listener) {
         this.selectCountListeners.add(listener);
     }
 
@@ -63,20 +63,20 @@ class EpisodeListAdapter extends BaseAdapter implements Filterable {
         this.selectCountListeners.remove(listener);
     }
 
-    public void setCurrentFilterText(CharSequence filter) {
+    void setCurrentFilterText(CharSequence filter) {
         this.currentFilter = filter;
         runFilter();
     }
 
-    public void setCurrentFilterSource(boolean feedTitle) {
+    void setCurrentFilterSource(boolean feedTitle) {
         useFeedTitle = feedTitle;
     }
 
-    public void runFilter() {
+    void runFilter() {
         getFilter().filter(this.currentFilter);
     }
 
-    public void runFilter(Filter.FilterListener listener) {
+    void runFilter(Filter.FilterListener listener) {
         getFilter().filter(this.currentFilter, listener);
     }
 
@@ -87,25 +87,23 @@ class EpisodeListAdapter extends BaseAdapter implements Filterable {
         }
     }
 
-    public Episode remove(int position) {
+    Episode remove(int position) {
         return this.allEpisodes.remove(position).episode;
     }
 
-    public ArrayList<Episode> getSelectedEpisodes(boolean deselectEpisodes) {
+    ArrayList<Episode> getSelectedEpisodes() {
         ArrayList<Episode> episodes = new ArrayList<>();
         for (int i = allEpisodes.size()-1; i >= 0 ; i--) {
             EpisodeSelectedTracker tracker = allEpisodes.get(i);
             if (tracker.selected) {
                 episodes.add(tracker.episode);
-                if (deselectEpisodes) {
-                    tracker.selected = false;
-                }
+                tracker.selected = false;
             }
         }
         return episodes;
     }
 
-    public void moveEpisodes(List<Integer> startPositions, int endPosition) {
+    void moveEpisodes(List<Integer> startPositions, int endPosition) {
         int adjuster = 0;
         int currentEpisodeNumber = storage.fast.getCurrentEpisodeNumber();
         for (int startPosition : startPositions) {

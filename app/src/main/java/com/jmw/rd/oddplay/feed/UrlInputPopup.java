@@ -56,7 +56,7 @@ public class UrlInputPopup extends PopupDialogFragment {
                              Bundle savedInstanceState) {
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         @SuppressLint("InflateParams")
-        final View dialogLayout = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.get_url_dialog, null);
+        final View dialogLayout = inflater.inflate(R.layout.get_url_dialog, null);
         Button searchFeedButton = (Button) dialogLayout.findViewById(R.id.feedSearchButton);
         searchFeedButton.setOnTouchListener(new SearchFeedListener());
         Button manuallyEnterUrlButton = (Button) dialogLayout.findViewById(R.id.urlDialogAdd);
@@ -96,7 +96,7 @@ public class UrlInputPopup extends PopupDialogFragment {
     public final class FragmentIntentIntegrator extends IntentIntegrator {
         private final Fragment fragment;
 
-        public FragmentIntentIntegrator(Fragment fragment) {
+        FragmentIntentIntegrator(Fragment fragment) {
             super(fragment.getActivity());
             this.fragment = fragment;
         }
@@ -187,7 +187,7 @@ public class UrlInputPopup extends PopupDialogFragment {
     }
 
     private static class Podcast {
-        public Podcast(String name, String url) {
+        Podcast(String name, String url) {
             this.name = name;
             this.url = url;
         }

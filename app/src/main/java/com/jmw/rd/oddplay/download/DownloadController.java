@@ -37,7 +37,7 @@ public class DownloadController {
         this.context = context;
     }
 
-    public void registerForDownloadStop(BroadcastReceiver receiver) {
+    void registerForDownloadStop(BroadcastReceiver receiver) {
         LocalBroadcastManager.getInstance(context).registerReceiver(receiver,
                 new IntentFilter(DOWNLOAD_STOP));
     }
@@ -82,7 +82,7 @@ public class DownloadController {
     }
 
 
-    public void broadcastDownloadAmt(String currentAmt, String total, String name,
+    void broadcastDownloadAmt(String currentAmt, String total, String name,
                                       String feedInfo, String numberInDownloadQueue,
                                       String totalInDownloadQueue) {
         final Intent i = new Intent(DownloadController.DOWNLOAD_INTENT);
@@ -97,21 +97,21 @@ public class DownloadController {
         LocalBroadcastManager.getInstance(context).sendBroadcast(i);
     }
 
-    public void broadcastParsingFeeds(String feedInfo) {
+    void broadcastParsingFeeds(String feedInfo) {
         final Intent i = new Intent(DownloadController.DOWNLOAD_INTENT);
         i.putExtra(DownloadController.INFO_PARSING_FEEDS, true);
         i.putExtra(DownloadController.INFO_DOWNLOAD_FEED_INFO, feedInfo);
         LocalBroadcastManager.getInstance(context).sendBroadcast(i);
     }
 
-    public void broadcastException(String exceptionInfo) {
+    void broadcastException(String exceptionInfo) {
         final Intent i = new Intent(DownloadController.DOWNLOAD_INTENT);
         i.putExtra(DownloadController.INFO_PARSING_FEEDS, true);
         i.putExtra(DownloadController.INFO_DOWNLOAD_FEED_INFO, exceptionInfo);
         LocalBroadcastManager.getInstance(context).sendBroadcast(i);
     }
 
-    public void broadcastDownloadEnded(String message) {
+    void broadcastDownloadEnded(String message) {
         final Intent i = new Intent(DownloadController.DOWNLOAD_INTENT);
         i.putExtra(DownloadController.INFO_DOWNLOAD_FINISHED, true);
         i.putExtra(DownloadController.INFO_DOWNLOAD_FINISHED_MESSAGE, message);

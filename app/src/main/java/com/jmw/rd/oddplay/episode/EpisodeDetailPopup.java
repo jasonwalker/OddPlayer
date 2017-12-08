@@ -23,6 +23,8 @@ import com.jmw.rd.oddplay.storage.Storage;
 import com.jmw.rd.oddplay.storage.StorageUtil;
 import com.jmw.rd.oddplay.widgets.PopupDialogFragment;
 
+import java.lang.ref.WeakReference;
+
 public class EpisodeDetailPopup extends PopupDialogFragment {
 
     private static final String EPISODE_KEY = "episode";
@@ -55,7 +57,11 @@ public class EpisodeDetailPopup extends PopupDialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        Window window = getDialog().getWindow();
+        if (window == null) {
+            throw new RuntimeException("Could not get window for episode detail popup.");
+        }
+        window.requestFeature(Window.FEATURE_NO_TITLE);
 
         View dialogLayout = inflater.inflate(R.layout.episode_detail, container, false);
         feedImage = (ImageView) dialogLayout.findViewById(R.id.episodeDetailImage);
@@ -84,7 +90,7 @@ public class EpisodeDetailPopup extends PopupDialogFragment {
             episodeDetailGotoButton.setHeight(0);
             episodeDetailGotoButton.setVisibility(View.INVISIBLE);
         }
-        PopulateViewTask populate = new PopulateViewTask();
+        PopulateViewTask populate = new PopulateViewTask(this);
         populate.execute();
         episodeDetailGotoButton.setOnTouchListener(new OnGotoListener());
         Button episodeDetailCancelButton = (Button) dialogLayout.findViewById(R.id.episodeDetailCancelButton);
@@ -92,20 +98,32 @@ public class EpisodeDetailPopup extends PopupDialogFragment {
         return dialogLayout;
     }
 
-    private class PopulateViewTask extends AsyncTask<Void, Object, Void> {
+    private static class PopulateViewTask extends AsyncTask<Void, Object, Void> {
         private int episodeNumber;
         private Bitmap bitmap;
+        private WeakReference<EpisodeDetailPopup> popupRef;
+
+        PopulateViewTask(EpisodeDetailPopup popup) {
+            popupRef = new WeakReference<>(popup);
+        }
+
         @Override
         protected Void doInBackground(Void... unused) {
-            episodeNumber = storage.getEpisodeNumber(episode) + 1;
-            bitmap = ImageHolder.getImageFromFeedUrl(storage, episode.getFeed());
+            EpisodeDetailPopup popup = popupRef.get();
+            if (popup != null) {
+                episodeNumber = popup.storage.getEpisodeNumber(popup.episode) + 1;
+                bitmap = ImageHolder.getImageFromFeedUrl(popup.storage, popup.episode.getFeed());
+            }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
-            feedImage.setImageBitmap(bitmap);
-            episodeDetailEpisodeNumber.setText(String.format(getActivity().getString(R.string.episodeNumber), episodeNumber));
+            EpisodeDetailPopup popup = popupRef.get();
+            if (popup != null) {
+                popup.feedImage.setImageBitmap(bitmap);
+                popup.episodeDetailEpisodeNumber.setText(String.format(popup.getActivity().getString(R.string.episodeNumber), episodeNumber));
+            }
         }
     }
 

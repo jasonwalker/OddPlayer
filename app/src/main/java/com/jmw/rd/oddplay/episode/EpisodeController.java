@@ -20,14 +20,14 @@ import java.util.ArrayList;
 public class EpisodeController {
 
     private static final String EPISODE_LIST_CHANGED = "com.jmw.rd.oddplayer.action.EPISODE_LIST_CHANGED";
-    public static final String EPISODE_ADDED = "EPISODE_ADDED";
-    public static final String EPISODE_REMOVE_BEFORE = "EPISODE_REMOVE_BEFORE";
-    public static final String EPISODE_DELETED = "EPISODE_DELETED";
-    public static final String EPISODE_MOVED = "EPISODE_MOVED";
-    public static final String EPISODE_MOVE_SOURCE = "EPISODE_MOVE_SOURCE";
-    public static final String EPISODE_MOVE_TARGET = "EPISODE_MOVE_TARGET";
-    public static final String EPISODE_NUMBER = "EPISODE_NUMBER";
-    public static final String EPISODE_VALUE = "EPISODE_VALUE";
+    static final String EPISODE_ADDED = "EPISODE_ADDED";
+    static final String EPISODE_REMOVE_BEFORE = "EPISODE_REMOVE_BEFORE";
+    static final String EPISODE_DELETED = "EPISODE_DELETED";
+    static final String EPISODE_MOVED = "EPISODE_MOVED";
+    static final String EPISODE_MOVE_SOURCE = "EPISODE_MOVE_SOURCE";
+    static final String EPISODE_MOVE_TARGET = "EPISODE_MOVE_TARGET";
+    static final String EPISODE_NUMBER = "EPISODE_NUMBER";
+    static final String EPISODE_VALUE = "EPISODE_VALUE";
 
     private final Context context;
 
@@ -39,7 +39,7 @@ public class EpisodeController {
         LocalBroadcastManager.getInstance(context).registerReceiver(receiver,
                 new IntentFilter(EPISODE_LIST_CHANGED));
     }
-    public void unregisterForEpisodeListChange(BroadcastReceiver receiver) {
+    void unregisterForEpisodeListChange(BroadcastReceiver receiver) {
         LocalBroadcastManager.getInstance(context).unregisterReceiver(receiver);
     }
 

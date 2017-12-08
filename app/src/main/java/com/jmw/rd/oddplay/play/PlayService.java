@@ -3,7 +3,6 @@ package com.jmw.rd.oddplay.play;
 import android.app.Notification;
 import android.app.Service;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -16,14 +15,22 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
+import android.os.SystemClock;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.jmw.rd.oddplay.ImageHolder;
+import com.jmw.rd.oddplay.R;
+import com.jmw.rd.oddplay.Utils;
 import com.jmw.rd.oddplay.episode.EpisodeController;
+import com.jmw.rd.oddplay.storage.DBStorage;
 import com.jmw.rd.oddplay.storage.Episode;
 import com.jmw.rd.oddplay.storage.Feed;
-import com.jmw.rd.oddplay.R;
 import com.jmw.rd.oddplay.storage.ResourceAllocationException;
 import com.jmw.rd.oddplay.storage.Storage;
 import com.jmw.rd.oddplay.storage.StorageUtil;
@@ -34,7 +41,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class PlayService extends Service {
-    public enum EpisodeState {SAME, NEW, NOTFOUND, ABORTED, EXCEPTION}
+
     private static final int MIN_AMOUNT_TIME_LEFT = 10000;
     private static final int MIN_DURATION_FOR_JUMP_BACK = 20000;
     private static final int UPDATE_INTERVAL = 200;
@@ -48,6 +55,7 @@ public class PlayService extends Service {
     private PlayController playController;
     private EpisodeController episodeController;
     private HandlerThread handlerThread;
+    private MediaSessionCompat mediaSession;
 
     public PlayService() {
         super();
@@ -60,6 +68,9 @@ public class PlayService extends Service {
         episodeController = new EpisodeController(this);
         storage = StorageUtil.getStorage(this);
         PowerManager mgr = (PowerManager) this.getSystemService(POWER_SERVICE);
+        if (mgr == null) {
+            throw new RuntimeException("Couldn't acquire power manager.  There is a problem with your phone");
+        }
         wakeLock = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock");
         wakeLock.acquire();
         startForeground(1991, new Notification());
@@ -115,7 +126,7 @@ public class PlayService extends Service {
         private boolean onCompleteFired = false;
         private int ffRewJumpDistance = 15000;
 
-        public ServiceHandler(Looper looper) {
+        private ServiceHandler(Looper looper) {
             super(looper);
             mp = new MediaPlayer();
             synchronized (mp) {
@@ -133,21 +144,62 @@ public class PlayService extends Service {
             }
             unplugAndThenNoiseReceiver = new NoisyAudioStreamReceiver();
             registerReceiver(unplugAndThenNoiseReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
-            ((AudioManager)getSystemService(AUDIO_SERVICE)).registerMediaButtonEventReceiver(new ComponentName(PlayService.this,
-                    AudioHardwareRemoteControlReceiver.class));
+            //AudioManager audioManager = ((AudioManager)getSystemService(AUDIO_SERVICE));
+            mediaSession = new MediaSessionCompat(getApplicationContext(), "Odd Player");
+            //audioManager.registerMediaButtonEventReceiver(new ComponentName(PlayService.this,
+           //         AudioHardwareRemoteControlReceiver.class));
             ffRewJumpDistance = storage.fast.getSkipDistance();
+            setUpCallBack();
         }
 
-        public void close() {
+        private void close() {
             this.sendTimingInfo(false);
-            ((AudioManager) getSystemService(AUDIO_SERVICE)).unregisterMediaButtonEventReceiver(new ComponentName(PlayService.this,
-                    AudioHardwareRemoteControlReceiver.class));
+            if (mediaSession != null) {
+                mediaSession.setActive(false);
+                mediaSession.release();
+                mediaSession = null;
+            }
+            //AudioManager audioManager = ((AudioManager)getSystemService(AUDIO_SERVICE));
+            //audioManager.unregisterMediaButtonEventReceiver(new ComponentName(PlayService.this,
+            //        AudioHardwareRemoteControlReceiver.class));
             telephonyManager.listen(callStateListener, PhoneStateListener.LISTEN_NONE);
             unregisterReceiver(unplugAndThenNoiseReceiver);
             synchronized (mp) {
                 mp.reset();
                 mp.release();
             }
+        }
+
+        private void setUpCallBack() {
+            mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+                    MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+            mediaSession.setCallback(new MediaSessionCompat.Callback() {
+                @Override
+                public void onPlay() {
+                    onHandleIntent(new Intent(PlayController.PLAY));
+                }
+
+                @Override
+                public void onPause() {
+                    onHandleIntent(new Intent(PlayController.PAUSE));
+                }
+
+                @Override
+                public void onSkipToNext() {
+                    onHandleIntent(new Intent(PlayController.NEXT));
+                }
+
+                @Override
+                public void onSkipToPrevious() {
+                    onHandleIntent(new Intent(PlayController.PREV));
+                }
+
+                @Override
+                public void onStop() {
+                    onHandleIntent(new Intent(PlayController.PAUSE));
+                }
+            });
+            mediaSession.setActive(true);
         }
 
         @Override
@@ -158,62 +210,65 @@ public class PlayService extends Service {
             }
         }
 
-        private int onHandleIntent(Intent intent) {
-            if (intent != null) {
-                final String action = intent.getAction();
-                switch (action) {
-                    case PlayController.INIT:
-                        goToEpisode(storage.fast.getCurrentEpisodeNumber(), false, false, false);
-                        refresh();
-                        break;
-                    case PlayController.TOGGLE_PLAY:
-                        play(!this.playing);
-                        break;
-                    case PlayController.GOTO:
-                        goToEpisode(intent.getIntExtra(PlayController.INFO_EPISODE_NUMBER, 0),
-                                intent.getBooleanExtra(PlayController.INFO_WAS_PLAYING, false), true, true);
-                        break;
-                    case PlayController.SEEK:
-                        seek(intent.getIntExtra(PlayController.JUMP_LOCATION, 0), true);
-                        break;
-                    case PlayController.REFRESH:
-                        refresh();
-                        break;
-                    case PlayController.ACTIVITY_PAUSING:
-                        if (!this.playing && !this.pausedForCall) {
-                            PlayService.this.stopSelf();
-                        }
-                        break;
-                    case PlayController.NEXT:
-                        goToEpisode(storage.fast.getCurrentEpisodeNumber() + 1, false, false, true);
-                        break;
-                    case PlayController.PREV:
-                        goToEpisode(storage.fast.getCurrentEpisodeNumber() - 1, false, false, true);
-                        break;
-                    case PlayController.PAUSE:
-                        play(false);
-                        break;
-                    case PlayController.PLAY:
-                        play(true);
-                        break;
-                    case PlayController.FF:
-                        int currPos;
-                        synchronized (mp) {
-                            currPos = mp.getCurrentPosition();
-                        }
-                        seek(currPos + ffRewJumpDistance, true);
-                        break;
-                    case PlayController.REWIND:
-                        int currPos2;
-                        synchronized (mp) {
-                            currPos2 = mp.getCurrentPosition();
-                        }
-                        seek(currPos2 - ffRewJumpDistance, true);
-                        break;
-
-                }
+        private void onHandleIntent(Intent intent) {
+            if (intent == null) {
+                return;
             }
-            return START_NOT_STICKY;
+            final String action = intent.getAction();
+            if (action == null) {
+                return;
+            }
+            switch (action) {
+                case PlayController.INIT:
+                    goToEpisode(storage.fast.getCurrentEpisodeNumber(), false, false, false);
+                    refresh();
+                    break;
+                case PlayController.TOGGLE_PLAY:
+                    play(!this.playing);
+                    break;
+                case PlayController.GOTO:
+                    goToEpisode(intent.getIntExtra(PlayController.INFO_EPISODE_NUMBER, 0),
+                            intent.getBooleanExtra(PlayController.INFO_WAS_PLAYING, false), true, true);
+                    break;
+                case PlayController.SEEK:
+                    seek(intent.getIntExtra(PlayController.JUMP_LOCATION, 0), true);
+                    break;
+                case PlayController.REFRESH:
+                    refresh();
+                    break;
+                case PlayController.ACTIVITY_PAUSING:
+                    if (!this.playing && !this.pausedForCall) {
+                        PlayService.this.stopSelf();
+                    }
+                    break;
+                case PlayController.NEXT:
+                    goToEpisode(storage.fast.getCurrentEpisodeNumber() + 1, false, false, true);
+                    break;
+                case PlayController.PREV:
+                    goToEpisode(storage.fast.getCurrentEpisodeNumber() - 1, false, false, true);
+                    break;
+                case PlayController.PAUSE:
+                    play(false);
+                    break;
+                case PlayController.PLAY:
+                    play(true);
+                    break;
+                case PlayController.FF:
+                    int currPos;
+                    synchronized (mp) {
+                        currPos = mp.getCurrentPosition();
+                    }
+                    seek(currPos + ffRewJumpDistance, true);
+                    break;
+                case PlayController.REWIND:
+                    int currPos2;
+                    synchronized (mp) {
+                        currPos2 = mp.getCurrentPosition();
+                    }
+                    seek(currPos2 - ffRewJumpDistance, true);
+                    break;
+            }
+
         }
 
         private void refresh() {
@@ -249,7 +304,9 @@ public class PlayService extends Service {
                     mp.pause();
                 }
                 AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                audioManager.abandonAudioFocus(audioFocusListener);
+                if (audioManager != null) {
+                    audioManager.abandonAudioFocus(audioFocusListener);
+                }
             } catch (IllegalStateException e) {
                 Log.d("PAUSE", e.getMessage(), e);
             }
@@ -265,6 +322,9 @@ public class PlayService extends Service {
             }
             if (doPlay) {
                 AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                if (audioManager == null) {
+                    throw new RuntimeException(("could not get AudioManager.  Something bad is happening with your phone"));
+                }
                 int result = audioManager.requestAudioFocus(audioFocusListener, AudioManager.STREAM_MUSIC,
                         AudioManager.AUDIOFOCUS_GAIN);
                 int count = 0;
@@ -294,7 +354,7 @@ public class PlayService extends Service {
             this.sendTimingInfo(this.playing);
         }
 
-        private EpisodeState goToEpisode(int episodeNumber, boolean definitelyPlay, boolean triggeredByUI, boolean broadcast) {
+        private void goToEpisode(int episodeNumber, boolean definitelyPlay, boolean triggeredByUI, boolean broadcast) {
             savePosition();
             Episode episode = storage.getEpisode(episodeNumber);
             if (episode != null) {
@@ -309,7 +369,7 @@ public class PlayService extends Service {
                                 storage.getNumberEpisodes(), false);
                         playController.broadcastState(this.playing, position, false);
                     }
-                    return EpisodeState.SAME;
+                    sendTextOverAVRCP();
                 } else {
                     try {
                         this.currentEpisode = episode;
@@ -348,20 +408,40 @@ public class PlayService extends Service {
                                     triggeredByUI);
                             playController.broadcastState(this.playing, audioLocation, true);
                         }
-                        return EpisodeState.NEW;
+                        sendTextOverAVRCP();
                     } catch (IOException | ResourceAllocationException e) {
                         Log.d("GoToEpisode", e.getMessage(), e);
                         playController.broadcastException(e);
-                        return EpisodeState.EXCEPTION;
                     }
                 }
             } else {
                 playController.broadcastInfo(0, episodeNumber, storage.getNumberEpisodes(), triggeredByUI);
                 playController.broadcastState(false, 0, false);
-                return EpisodeState.NOTFOUND;
             }
         }
 
+        private void sendTextOverAVRCP() {
+            int state = this.playing ? (int) PlaybackStateCompat.ACTION_PLAY : (int) PlaybackStateCompat.ACTION_PAUSE;
+            PlaybackStateCompat playState = new PlaybackStateCompat.Builder()
+                    .setActions(
+                            PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PLAY_PAUSE |
+                                    PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID | PlaybackStateCompat.ACTION_PAUSE |
+                                    PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
+                    .setState(state, currentEpisode.getAudioLocation(), 1, SystemClock.elapsedRealtime())
+                    .build();
+            MediaMetadataCompat metadata = new MediaMetadataCompat.Builder()
+                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentEpisode.getTitle())
+                    .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, 1)
+                    .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currentEpisode.getFeedTitle())
+                    .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, Utils.dateStringFromLong(currentEpisode.getPublishDate()))
+                    .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, ImageHolder.getImageFromFeedUrl(DBStorage.getDBStorage(getApplicationContext()),currentEpisode.getFeed()))
+                    .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, (int)currentEpisode.getAudioSize())
+                    .build();
+
+            mediaSession.setMetadata(metadata);
+            mediaSession.setPlaybackState(playState);
+        }
+ 
         private void seek(int position, boolean broadcastState) {
             if (this.currentEpisode == null) {
                 return;

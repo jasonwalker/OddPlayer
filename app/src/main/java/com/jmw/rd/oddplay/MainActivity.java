@@ -18,7 +18,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,8 +25,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
-
 import com.jmw.rd.oddplay.download.DownloadController;
 import com.jmw.rd.oddplay.episode.EpisodeController;
 import com.jmw.rd.oddplay.episode.EpisodeViewPage;
@@ -41,8 +38,7 @@ import com.jmw.rd.oddplay.play.PlayViewPage;
 import com.jmw.rd.oddplay.settings.SettingsViewPage;
 import com.jmw.rd.oddplay.storage.Storage;
 import com.jmw.rd.oddplay.storage.StorageUtil;
-
-import java.io.File;
+import java.lang.ref.WeakReference;
 
 public class MainActivity extends AppCompatActivity implements
         OnItemClickListener {
@@ -90,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements
         //strictMode();
         episodesView = new EpisodeViewPage();
         playView = new PlayViewPage();
-        InitViews initViews = new InitViews();
+        InitViews initViews = new InitViews(this);
         initViews.execute();
         ListView drawer = (ListView) findViewById(R.id.drawer);
         drawer.setAdapter(new ArrayAdapter<>(
@@ -103,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements
         toggle = new DrawerListener(this, drawerLayout,
                 R.string.drawer_open,
                 R.string.drawer_close);
-        drawerLayout.setDrawerListener(toggle);
+        drawerLayout.addDrawerListener(toggle);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -114,49 +110,67 @@ public class MainActivity extends AppCompatActivity implements
         playStateReceiver = new PlayStateReceiver();
     }
 
-    private class InitViews extends AsyncTask<Void, Void, Void> {
+    private static class InitViews extends AsyncTask<Void, Void, Void> {
         private Storage storage;
         private int feedsSize;
+        private WeakReference<MainActivity> activityRef;
+
+        InitViews(MainActivity activity) {
+            this.activityRef = new WeakReference<>(activity);
+        }
+
         @Override
         protected Void doInBackground(Void... unused) {
-            try {
-                storage = StorageUtil.getStorage(MainActivity.this);
-                //get storage to cache number episodes
-                storage.getNumberEpisodes();
-                //initialize storage location, getSelectedStorage will choose first external if available
-                //otherwise default to internal
-                storage.setSelectedStorage(storage.getSelectedStorage());
-                feedsSize = storage.getFeeds().size();
-                //creates dir if needed
-                storage.getEpisodesDir();
-            } catch(ResourceAllocationException e) {
-                Dialog.showOK(MainActivity.this, getString(R.string.problemInitializing));
+            MainActivity activity = activityRef.get();
+            if (activity != null) {
+                try {
+                    storage = StorageUtil.getStorage(activity);
+                    //get storage to cache number episodes
+                    storage.getNumberEpisodes();
+                    //initialize storage location, getSelectedStorage will choose first external if available
+                    //otherwise default to internal
+                    storage.setSelectedStorage(storage.getSelectedStorage());
+                    feedsSize = storage.getFeeds().size();
+                    //creates dir if needed
+                    storage.getEpisodesDir();
+                } catch (ResourceAllocationException e) {
+                    Dialog.showOK(activity, activity.getString(R.string.problemInitializing));
+                }
             }
             return null;
         }
         @Override
         protected void onPostExecute(Void result) {
-            if (getFragmentManager().findFragmentById(R.id.content) == null) {
-                if (feedsSize == 0) {
-                    feedsView = new FeedsViewPage();
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.content, feedsView).commit();
-                    setTitle(getString(R.string.titleFeeds));
-                    displayingFragment = feedsView;
-                    Dialog.showOK(MainActivity.this, getString(R.string.getStarted));
-                } else {
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.content, playView).commit();
-                    setTitle(getString(R.string.titlePlay));
-                    displayingFragment = playView;
+            MainActivity activity = activityRef.get();
+            if (activity != null) {
+                if (activity.getFragmentManager().findFragmentById(R.id.content) == null) {
+                    if (feedsSize == 0) {
+                        activity.feedsView = new FeedsViewPage();
+                        activity.getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.content, activity.feedsView).commit();
+                        activity.setTitle(activity.getString(R.string.titleFeeds));
+                        activity.displayingFragment = activity.feedsView;
+                        Dialog.showOK(activity, activity.getString(R.string.getStarted));
+                    } else {
+                        activity.getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.content, activity.playView).commit();
+                        activity.setTitle(activity.getString(R.string.titlePlay));
+                        activity.displayingFragment = activity.playView;
+                    }
                 }
+                activity.downloadController = new DownloadController(activity);
+                activity.episodeController = new EpisodeController(activity);
+                activity.downloadProgressReceiver = new DownloadProgressReceiver(activity);
+                activity.downloadController.registerForDownloadEvent(activity.downloadProgressReceiver);
             }
-            downloadController = new DownloadController(MainActivity.this);
-            episodeController = new EpisodeController(MainActivity.this);
-            downloadProgressReceiver = new DownloadProgressReceiver();
-            downloadController.registerForDownloadEvent(downloadProgressReceiver);
         }
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        //No call for super(). Bug on API Level > 11.
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -307,7 +321,7 @@ public class MainActivity extends AppCompatActivity implements
             DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     if (which == DialogInterface.BUTTON_POSITIVE) {
-                        DeletePreviousEpisodesTask deleteTask = new DeletePreviousEpisodesTask(currentNumber);
+                        DeletePreviousEpisodesTask deleteTask = new DeletePreviousEpisodesTask(MainActivity.this, currentNumber);
                         deleteTask.execute();
                     }
                 }
@@ -406,17 +420,23 @@ public class MainActivity extends AppCompatActivity implements
         runnable = null;
     }
 
-    private class DeletePreviousEpisodesTask extends AsyncTask<Void, Integer, Void> {
+    private static class DeletePreviousEpisodesTask extends AsyncTask<Void, Integer, Void> {
         private final int number;
+        private WeakReference<MainActivity> activityRef;
 
-        public DeletePreviousEpisodesTask(int numbers) {
+
+        DeletePreviousEpisodesTask(MainActivity activity, int numbers) {
+            this.activityRef = new WeakReference<>(activity);
             this.number = numbers;
         }
 
         @Override
         protected Void doInBackground(Void... unused) {
             try {
-                episodeController.deleteEpisodesBefore(number);
+                MainActivity activity = activityRef.get();
+                if (activity != null) {
+                    activity.episodeController.deleteEpisodesBefore(number);
+                }
             } catch (ResourceAllocationException e){
                 // can't do much here
             }
@@ -425,41 +445,50 @@ public class MainActivity extends AppCompatActivity implements
 
         @Override
         protected void onPostExecute(Void result) {
-            if (MainActivity.this.displayingFragment == episodesView) {
-                episodesView.refreshEpisodesScroll();
+            MainActivity activity = activityRef.get();
+            if (activity != null && activity.displayingFragment == activity.episodesView) {
+                activity.episodesView.refreshEpisodesScroll();
             }
         }
     }
 
-    private class DownloadProgressReceiver extends BroadcastReceiver {
+    private static class DownloadProgressReceiver extends BroadcastReceiver {
+        private WeakReference<MainActivity> activityRef;
+
+        public DownloadProgressReceiver(MainActivity activity) {
+            activityRef = new WeakReference<>(activity);
+        }
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            final boolean finished = intent.getBooleanExtra(DownloadController.INFO_DOWNLOAD_FINISHED, false);
-            if (finished) {
-                if (attemptingDownloadStopDialog != null) {
-                    attemptingDownloadStopDialog.dismiss();
-                    attemptingDownloadStopDialog = null;
-                }
-                synchronized (refreshButtonLock) {
-                    if (MainActivity.this.spinningRefreshButton != null) {
-                        spinningRefreshButton.stop();
-                        spinningRefreshButton = null;
+            MainActivity activity = activityRef.get();
+            if (activity != null) {
+                final boolean finished = intent.getBooleanExtra(DownloadController.INFO_DOWNLOAD_FINISHED, false);
+                if (finished) {
+                    if (activity.attemptingDownloadStopDialog != null) {
+                        activity.attemptingDownloadStopDialog.dismiss();
+                        activity.attemptingDownloadStopDialog = null;
+                    }
+                    synchronized (refreshButtonLock) {
+                        if (activity.spinningRefreshButton != null) {
+                            activity.spinningRefreshButton.stop();
+                            activity.spinningRefreshButton = null;
+                        }
+                    }
+                } else {
+                    synchronized (refreshButtonLock) {
+                        if (activity.spinningRefreshButton == null) {
+                            activity.displayDownloadingIcon();
+                        }
                     }
                 }
-            } else {
-                synchronized (refreshButtonLock) {
-                    if (MainActivity.this.spinningRefreshButton == null) {
-                        displayDownloadingIcon();
-                    }
-                }
+                activity.episodesView.displayDownloadBroadcast(intent);
             }
-            episodesView.displayDownloadBroadcast(intent);
         }
     }
 
     private class DrawerListener extends ActionBarDrawerToggle {
-        public DrawerListener(Activity activity, DrawerLayout drawerLayout, int openDrawerContentDescRes, int closeDrawerContentDescRes) {
+        DrawerListener(Activity activity, DrawerLayout drawerLayout, int openDrawerContentDescRes, int closeDrawerContentDescRes) {
             super(activity, drawerLayout, openDrawerContentDescRes, closeDrawerContentDescRes);
         }
 

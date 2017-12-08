@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -50,7 +51,7 @@ class BackupFileServer extends NanoHTTPD {
         private final boolean onlyMetaData;
         private final OutputStream output;
 
-        public OutputThread(OutputStream output, boolean onlyMetaData) {
+        private OutputThread(OutputStream output, boolean onlyMetaData) {
             this.setDaemon(true);
             this.output = output;
             this.onlyMetaData = onlyMetaData;
@@ -101,7 +102,7 @@ class BackupFileServer extends NanoHTTPD {
             private final String tmpdir;
             private final List<TempFile> tempFiles;
 
-            public ServerTempFileManager() throws ResourceAllocationException{
+            private ServerTempFileManager() throws ResourceAllocationException{
                 tmpdir = BackupFileServer.this.storage.getEpisodesDir().getAbsolutePath();
                 tempFiles = new ArrayList<>();
             }
@@ -156,7 +157,7 @@ class BackupFileServer extends NanoHTTPD {
                 }
             } else {
                 try {
-                    String host = String.format("http://%s:%d", Utils.getIPAddress(context), this.port);
+                    String host = String.format(Locale.US, "http://%s:%d", Utils.getIPAddress(context), this.port);
                     String output = String.format(this.context.getString(R.string.FileBackupIndex), storage.getEpisodesDir().getAbsoluteFile(), host);
                     return new NanoHTTPD.Response(Response.Status.OK, "text/html", output);
                 } catch (ResourceAllocationException e) {

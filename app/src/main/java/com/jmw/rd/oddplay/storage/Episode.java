@@ -6,6 +6,8 @@ import android.os.Parcelable;
 
 import org.jsoup.Jsoup;
 
+import java.util.Locale;
+
 public class Episode implements Parcelable {
     /**
      * Static field used to regenerate object, individually or as arrays
@@ -63,7 +65,7 @@ public class Episode implements Parcelable {
     }
 
     public String toString() {
-        return String.format("Title: %s\nFeed title: %s\nPublish date: %d\nDownload date: %d\nDescription: %s\n" +
+        return String.format(Locale.US, "Title: %s\nFeed title: %s\nPublish date: %d\nDownload date: %d\nDescription: %s\n" +
             "Audio url: %s\nAudioSize: %d\nAudio location: %d\nAudio type: %s\nAudio filename: %s\n" +
                         "Audio duration: %d",
             title, feedTitle, publishDate, downloadDate, description, audioUrl, audioSize, audioLocation,

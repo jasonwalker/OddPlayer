@@ -26,6 +26,9 @@ import com.jmw.rd.oddplay.storage.StorageUtil;
 import com.jmw.rd.oddplay.widgets.PlayImageWrapper;
 import com.jmw.rd.oddplay.widgets.SeekBarWrapper;
 
+import java.lang.ref.WeakReference;
+import java.util.Locale;
+
 
 public class PlayViewPage extends PodPage {
     private static final int OFF_SCREEN_FRAGMENTS = 3;
@@ -64,7 +67,7 @@ public class PlayViewPage extends PodPage {
         playPager.setAdapter(pagerAdapter);
         playPager.setOffscreenPageLimit(OFF_SCREEN_FRAGMENTS);
         playPager.addOnPageChangeListener(new PageChangeListener());
-        InitPage initPage = new InitPage();
+        InitPage initPage = new InitPage(this);
         initPage.execute();
         timingText = (TextView) rootView.findViewById(R.id.timingText);
         countText = (TextView) rootView.findViewById(R.id.countText);
@@ -89,19 +92,30 @@ public class PlayViewPage extends PodPage {
         return rootView;
     }
 
-    private class InitPage extends AsyncTask<Void, Void, Void> {
+    private static class InitPage extends AsyncTask<Void, Void, Void> {
+        WeakReference<PlayViewPage> pageRef;
+
+        InitPage(PlayViewPage page) {
+            pageRef = new WeakReference<>(page);
+        }
 
         @Override
         protected void onPreExecute() {
-            pagerAdapter.notifyDataSetChanged();
+            PlayViewPage page = pageRef.get();
+            if (page != null) {
+                page.pagerAdapter.notifyDataSetChanged();
+            }
         }
 
 
         @Override
         protected Void doInBackground(Void... unused) {
-            // two below just initialize count from db
-            if (pagerAdapter.getCount() > 0) {
-                pagerAdapter.getItemId(0);
+            PlayViewPage page = pageRef.get();
+            if (page != null) {
+                // two below just initialize count from db
+                if (page.pagerAdapter.getCount() > 0) {
+                    page.pagerAdapter.getItemId(0);
+                }
             }
 
             //toggleDescriptionRotationDown = AnimationUtils.loadAnimation(activity.getApplicationContext(), R.anim.rotate_halfway);
@@ -111,8 +125,11 @@ public class PlayViewPage extends PodPage {
 
         @Override
         protected void onPostExecute(Void result) {
-            // pager adapter initalized by 'getCount' call above
-            playPager.setCurrentItem(StorageUtil.getStorage(activity).fast.getCurrentEpisodeNumber(), false);
+            PlayViewPage page = pageRef.get();
+            if (page != null) {
+                // pager adapter initalized by 'getCount' call above
+                page.playPager.setCurrentItem(StorageUtil.getStorage(page.activity).fast.getCurrentEpisodeNumber(), false);
+            }
 
         }
     }
@@ -151,7 +168,7 @@ public class PlayViewPage extends PodPage {
     }
 
     private void setCountInfo(int currentNumber, int total) {
-        this.countText.setText(String.format("(%1$d/%2$d)", currentNumber, total));
+        this.countText.setText(String.format(Locale.US, "(%1$d/%2$d)", currentNumber, total));
     }
 
     private class PageChangeListener implements ViewPager.OnPageChangeListener {
@@ -234,7 +251,7 @@ public class PlayViewPage extends PodPage {
             boolean currState = intent.getBooleanExtra(PlayController.STATE_PLAYING, false);
             // doing conditional just to spare a function call
             if (playing != currState) {
-                playImage.setPlaying(currState, true);
+                playImage.setPlaying(currState);
                 playing = currState;
             }
             boolean animate = intent.getBooleanExtra(PlayController.STATE_EPISODE_CHANGE, false);
